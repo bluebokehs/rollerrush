@@ -240,13 +240,13 @@
 
 				body.position.z -= (0.001 + (speed1[0] * .01));
 				body.position.z += (0.001 + (speed1[2] * .01));
-				body.position.x -= (0.001 + (speed1[3] * .01));
-				body.position.x += (0.001 + (speed1[1] * .01));
+				body.position.x -= (0.001 + (speed1[1] * .01));
+				body.position.x += (0.001 + (speed1[3] * .01));
 
-				speed1[0] = Math;
-				speed1[1]--;
-				speed1[2]--;
-				speed1[3]--;
+				speed1[0] = Math.max(speed1[0], 0);
+				speed1[1] = Math.max(speed1[1], 0);
+				speed1[2] = Math.max(speed1[2], 0);
+				speed1[3] = Math.max(speed1[3], 0);
 				
 				// update three.js player 1
 				player1.position.set(body.position.x, body.position.y, body.position.z);
