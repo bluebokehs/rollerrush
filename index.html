@@ -16,6 +16,9 @@
 			let speed1 = [0, 0, 0, 0];
 			let speed2 = [0, 0, 0, 0];
 			const scene = new THREE.Scene();
+
+			let cameraFocus = [0, 0, 0];
+			let cameraOffset = [0, 0, 0];
 			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			
 			// orthographic camera
@@ -122,70 +125,15 @@
 			scene.add(directionalLight);
 
 			// move the camera
-			camera.position.z = 5;
-			camera.position.y = 3;
+			camera.position.z = 4;
+			camera.position.y = 5;
 			camera.position.x = 0;
-			camera.lookAt(0, 0, 0);
+			camera.lookAt((body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2);
 
-			/*const moveBody = function (isBody1, isZ, isNeg) {
-				if(isBody1) {
-					if(isZ) {
-						if(isNeg) {
-							body.position.z -= 0.05;
-						} else {
-							body.position.z += 0.05;
-						}
-					} else {
-						if(isNeg) {
-							body.position.x -= 0.05;
-						} else {
-							body.position.x += 0.05;
-						}
-					}
-				} else {
-					if(isZ) {
-						if(isNeg) {
-							body2.position.z -= 0.05;
-						} else {
-							body2.position.z += 0.05;
-						}
-					} else {
-						if(isNeg) {
-							body2.position.x -= 0.05;
-						} else {
-							body2.position.x += 0.05;
-						}
-					}
-				}
-			}
-
-			const controller = {
-				w: {pressed: false, func: moveBody(true, true, true)},
-				s: {pressed: false, func: moveBody(true, true, false)},
-				a: {pressed: false, func: moveBody(true, false, true)},
-				d: {pressed: false, func: moveBody(true, false, false)},
-				ArrowUp: {pressed: false, func: moveBody(false, true, true)},
-				ArrowDown: {pressed: false, func: moveBody(false, true, false)},
-				ArrowLeft: {pressed: false, func: moveBody(false, false, true)},
-				ArrowRight: {pressed: false, func: moveBody(false, false, false)},
-			}
-
-			document.addEventListener("keydown", (e) => {
-				if(controller[e.key]){
-					controller[e.key].pressed = true
-				}
-			})
-			document.addEventListener("keyup", (e) => {
-				if(controller[e.key]){
-					controller[e.key].pressed = false
-				}
-			})
-
-			const executeMoves = () => {
-  				Object.keys(controller).forEach(key=> {
-    				controller[key].pressed && controller[key].func()
-  				})
-			}*/
+			// set camera offset
+			cameraOffset[0] = camera.position.x - (body2.position.x + body.position.x)/2;
+			cameraOffset[1] = camera.position.y - (body2.position.y + body.position.y)/2;
+			cameraOffset[2] = camera.position.z - (body2.position.z + body.position.z)/2;
 
 			document.addEventListener('keyup', (event) => {
 				const keyName = event.key;
@@ -234,6 +182,13 @@
 			const update = function () {
 				//console.log(player1.position.y);
 				//executeMoves();
+
+				// camera
+
+				cameraFocus = [(body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2];
+				camera.position.set(cameraOffset[0] + cameraFocus[0], cameraOffset[1] + cameraFocus[1], cameraOffset[2] + cameraFocus[2]);
+
+				// speed and deceleration
 
 				body.position.z -= (0.01 + (speed1[0] * .01));
 				body.position.z += (0.01 + (speed1[2] * .01));
