@@ -210,23 +210,19 @@
 				// player 2
 				if (keyName == 'ArrowUp') {
 					// move player forwards
-					speed2++;
-					body2.position.z -= (0.05 + (speed2 * .01));
+					speed2[0]+=1.5;
 				}
 				if (keyName == 'ArrowDown') {
 					// move player backwards
-					speed2++;
-					body2.position.z += (0.05 + (speed2 * .01));
+					speed2[2]+=1.5;
 				}
 				if (keyName == 'ArrowLeft') {
 					// move player left
-					speed2++;
-					body2.position.x -= (0.05 + (speed2 * .01));
+					speed2[1]+=1.5;
 				}
 				if (keyName == 'ArrowRight') {
 					// move player right
-					speed2++;
-					body2.position.x += (0.05 + (speed2 * .01));
+					speed2[3]+=1.5;
 				}
 			})
 
@@ -247,6 +243,16 @@
 				speed1[1] = Math.max(speed1[1] - 0.01, 0);
 				speed1[2] = Math.max(speed1[2] - 0.01, 0);
 				speed1[3] = Math.max(speed1[3] - 0.01, 0);
+
+				body2.position.z -= (0.001 + (speed2[0] * .01));
+				body2.position.z += (0.001 + (speed2[2] * .01));
+				body2.position.x -= (0.001 + (speed2[1] * .01));
+				body2.position.x += (0.001 + (speed2[3] * .01));
+
+				speed2[0] = Math.max(speed2[0] - 0.01, 0);
+				speed2[1] = Math.max(speed2[1] - 0.01, 0);
+				speed2[2] = Math.max(speed2[2] - 0.01, 0);
+				speed2[3] = Math.max(speed2[3] - 0.01, 0);
 				
 				// update three.js player 1
 				player1.position.set(body.position.x, body.position.y, body.position.z);
