@@ -234,20 +234,20 @@
 				//console.log(player1.position.y);
 				//executeMoves();
 
-				body.position.z -= (0.001 + (speed1[0] * .01));
-				body.position.z += (0.001 + (speed1[2] * .01));
-				body.position.x -= (0.001 + (speed1[1] * .01));
-				body.position.x += (0.001 + (speed1[3] * .01));
+				body.position.z -= (0.01 + (speed1[0] * .01));
+				body.position.z += (0.01 + (speed1[2] * .01));
+				body.position.x -= (0.01 + (speed1[1] * .01));
+				body.position.x += (0.01 + (speed1[3] * .01));
 
 				speed1[0] = Math.max(speed1[0] - 0.01, 0);
 				speed1[1] = Math.max(speed1[1] - 0.01, 0);
 				speed1[2] = Math.max(speed1[2] - 0.01, 0);
 				speed1[3] = Math.max(speed1[3] - 0.01, 0);
 
-				body2.position.z -= (0.001 + (speed2[0] * .01));
-				body2.position.z += (0.001 + (speed2[2] * .01));
-				body2.position.x -= (0.001 + (speed2[1] * .01));
-				body2.position.x += (0.001 + (speed2[3] * .01));
+				body2.position.z -= (0.01 + (speed2[0] * .01));
+				body2.position.z += (0.01 + (speed2[2] * .01));
+				body2.position.x -= (0.01 + (speed2[1] * .01));
+				body2.position.x += (0.01 + (speed2[3] * .01));
 
 				speed2[0] = Math.max(speed2[0] - 0.01, 0);
 				speed2[1] = Math.max(speed2[1] - 0.01, 0);
