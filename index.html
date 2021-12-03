@@ -12,6 +12,8 @@
 		<script src="js/three.js"></script>
 		<script src="js/cannon.js"></script>
 		<script>
+			let speed1 = 0;
+			let speed2 = 0;
 			const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			
@@ -184,43 +186,51 @@
   				})
 			}*/
 
-			document.addEventListener('keydown', (event) => {
+			document.addEventListener('keyup', (event) => {
 				const keyName = event.key;
 
 				// player 1
 				if (keyName == 'w') {
 					// move player forwards
-					body.position.z -= 0.05;
+					speed1++;
+					body.position.z -= (0.05 + (speed1 * .01));
 				}
 				if (keyName == 's') {
 					// move player backwards
-					body.position.z += 0.05;
+					speed1++;
+					body.position.z += (0.05 + (speed1 * .01));
 				}
 				if (keyName == 'a') {
 					// move player left
-					body.position.x -= 0.05;
+					speed1++;
+					body.position.x -= (0.05 + (speed1 * .01));
 				}
 				if (keyName == 'd') {
 					// move player right
-					body.position.x += 0.05;
+					speed1++;
+					body.position.x += (0.05 + (speed1 * .01));
 				}
 
 				// player 2
 				if (keyName == 'ArrowUp') {
 					// move player forwards
-					body2.position.z -= 0.05;
+					speed2++;
+					body2.position.z -= (0.05 + (speed2 * .01));
 				}
 				if (keyName == 'ArrowDown') {
 					// move player backwards
-					body2.position.z += 0.05;
+					speed2++;
+					body2.position.z += (0.05 + (speed2 * .01));
 				}
 				if (keyName == 'ArrowLeft') {
 					// move player left
-					body2.position.x -= 0.05;
+					speed2++;
+					body2.position.x -= (0.05 + (speed2 * .01));
 				}
 				if (keyName == 'ArrowRight') {
 					// move player right
-					body2.position.x += 0.05;
+					speed2++;
+					body2.position.x += (0.05 + (speed2 * .01));
 				}
 			})
 
