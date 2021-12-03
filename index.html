@@ -12,8 +12,8 @@
 		<script src="js/three.js"></script>
 		<script src="js/cannon.js"></script>
 		<script>
-			let speed1 = 0;
-			let speed2 = 0;
+			let speed1 = [0, 0, 0, 0];
+			let speed2 = [0, 0, 0, 0];
 			const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			
@@ -192,23 +192,19 @@
 				// player 1
 				if (keyName == 'w') {
 					// move player forwards
-					speed1++;
-					body.position.z -= (0.05 + (speed1 * .01));
+					speed1[0]+=1.5;
 				}
 				if (keyName == 's') {
 					// move player backwards
-					speed1++;
-					body.position.z += (0.05 + (speed1 * .01));
+					speed1[2]+=1.5;
 				}
 				if (keyName == 'a') {
 					// move player left
-					speed1++;
-					body.position.x -= (0.05 + (speed1 * .01));
+					speed1[1]+=1.5;
 				}
 				if (keyName == 'd') {
 					// move player right
-					speed1++;
-					body.position.x += (0.05 + (speed1 * .01));
+					speed1[3]+=1.5;
 				}
 
 				// player 2
@@ -242,6 +238,16 @@
 				//console.log(player1.position.y);
 				//executeMoves();
 
+				body.position.z -= (0.001 + (speed1[0] * .01));
+				body.position.z += (0.001 + (speed1[2] * .01));
+				body.position.x -= (0.001 + (speed1[3] * .01));
+				body.position.x += (0.001 + (speed1[1] * .01));
+
+				speed1[0] = Math;
+				speed1[1]--;
+				speed1[2]--;
+				speed1[3]--;
+				
 				// update three.js player 1
 				player1.position.set(body.position.x, body.position.y, body.position.z);
 				player1.quaternion.set(
