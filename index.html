@@ -11,6 +11,7 @@
 		<!--<div id="info">Description</div>-->
 		<script src="js/three.js"></script>
 		<script src="js/cannon.js"></script>
+		<script src="js/main.js"></script>
 		<script>
 			let speed1 = [0, 0, 0, 0];
 			let speed2 = [0, 0, 0, 0];
@@ -254,6 +255,10 @@
 				speed2[2] = Math.max(speed2[2] - 0.01, 0);
 				speed2[3] = Math.max(speed2[3] - 0.01, 0);
 				
+				if (body.position.y < -3 || body2.position.y < -3) {
+					reset();
+				}
+
 				// update three.js player 1
 				player1.position.set(body.position.x, body.position.y, body.position.z);
 				player1.quaternion.set(
@@ -277,6 +282,24 @@
 			const render = function () {
 				renderer.render( scene, camera );
 			};
+
+			//resets players to original positions
+			const reset = function () {
+				body.position.x = -1;
+				body.position.y = 3;
+				body.position.z = 0;
+				body2.position.x = 1;
+				body2.position.y = 3;
+				body2.position.z = 0;
+				speed1[0] = 0;
+				speed1[1] = 0;
+				speed1[2] = 0;
+				speed1[3] = 0;
+				speed2[0] = 0;
+				speed2[1] = 0;
+				speed2[2] = 0;
+				speed2[3] = 0;
+			}
 
 			// run game loop (update, render, repeat)
 			const GameLoop = function () {
