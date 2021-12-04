@@ -11,10 +11,10 @@
 		<script src="js/three.js"></script>
 		<script src="js/cannon.js"></script>
 		<script src="js/main.js"></script>
-		<script>
-			import CannonUtils from './utils/cannonUtils.js';
+		<script type="module">
+			//import CannonUtils from './js/cannonUtils.js';
 			import { OBJLoader } from 'https://cdn.skypack.dev/three@0.131.1/examples/jsm/loaders/OBJLoader.js';
-
+				
 			const scene = new THREE.Scene();
 
 			let cameraFocus = [0, 0, 0];
@@ -41,15 +41,17 @@
 			// intitialize CannonJS
 			const world = new CANNON.World();
 			world.gravity.set(0, -10, 0); // gravity pulls things down
-
 			
 			
 			// create the cylinder
+			/*
 			const geometry = new THREE.CylinderGeometry(3, 3, 2, 60);
 			const material = new THREE.MeshLambertMaterial( { color: 0x77ccff } );
 			const cylinder = new THREE.Mesh( geometry, material );
 			cylinder.receiveShadow = true;
 			scene.add( cylinder );
+			*/
+			
 
 			var groundMaterial = new CANNON.Material("groundMaterial");
 			// Adjust constraint equation parameters for ground/ground contact
@@ -62,13 +64,17 @@
 				frictionEquationRegularizationTime: 3,
         	});
 
+			
 			// create physics for cylinder
+			/*
 			const cylinderShape = new CANNON.Cylinder(3, 3, 2, 30);
 			const cylinderMaterial = groundMaterial;
 			const cylinderBody = new CANNON.Body({mass: 0, material: groundMaterial})
 			cylinderBody.addShape(cylinderShape);
 			cylinderBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
 			world.add(cylinderBody);
+			*/
+
 
 			// Create a slippery material (friction coefficient = 0.0)
 			var slipperyMaterial = new CANNON.Material("slipperyMaterial");
@@ -93,6 +99,48 @@
 
 			// We must add the contact materials to the world
 			world.addContactMaterial(slippery_slippery_cm);
+            
+			
+			var levelMesh;
+			var levelBody;
+			var levelLoaded = false;
+			const objLoader = new OBJLoader();
+			objLoader.load(
+                'maps/monkey.obj',
+                (object) => {
+                    scene.add(object)
+					
+                    levelMesh = object.children[0]
+                    levelMesh.material = new THREE.MeshNormalMaterial()
+					levelMesh.position.x = 0;
+					levelMesh.position.y = 0;
+
+					const vertices = levelMesh.geometry.attributes.position.array;
+        			const indices = Object.keys(vertices).map(Number);			
+					console.log(vertices);
+					console.log(indices);
+                    const levelShape = new CANNON.Trimesh(vertices, indices);
+                    
+					console.log(levelShape);
+
+					levelBody = new CANNON.Body({ mass: 0 })
+                    levelBody.addShape(levelShape)
+                    levelBody.position.x = levelMesh.position.x
+                    levelBody.position.y = levelMesh.position.y
+                    levelBody.position.z = levelMesh.position.z
+                    
+					world.addBody(levelBody)
+					
+                    levelLoaded = true
+                },
+                (xhr) => {
+                    console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+                },
+                (error) => {
+                    console.log('An error happened ' + error)
+                }
+            )
+			
 
 			// create player 1
 			const player1Geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
@@ -221,7 +269,7 @@
 				cameraFocus = [(body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2];
 				camera.position.set(cameraOffset[0] + cameraFocus[0], cameraOffset[1] + cameraFocus[1], cameraOffset[2] + cameraFocus[2]);
 				
-				if (body.position.y < -3 || body2.position.y < -3) {
+				if (body.position.y < -5 || body2.position.y < -5) {
 					reset();
 				}
 
