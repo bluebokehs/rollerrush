@@ -8,13 +8,13 @@
 		</style>
 	</head>
 	<body>
-		<!--<div id="info">Description</div>-->
 		<script src="js/three.js"></script>
 		<script src="js/cannon.js"></script>
 		<script src="js/main.js"></script>
 		<script>
-			let speed1 = [0, 0, 0, 0];
-			let speed2 = [0, 0, 0, 0];
+			import CannonUtils from './utils/cannonUtils.js';
+			import { OBJLoader } from 'https://cdn.skypack.dev/three@0.131.1/examples/jsm/loaders/OBJLoader.js';
+
 			const scene = new THREE.Scene();
 
 			let cameraFocus = [0, 0, 0];
@@ -42,6 +42,7 @@
 			const world = new CANNON.World();
 			world.gravity.set(0, -10, 0); // gravity pulls things down
 
+			
 			
 			// create the cylinder
 			const geometry = new THREE.CylinderGeometry(3, 3, 2, 60);
@@ -87,7 +88,7 @@
 			// We want to have a heavy impact on player collisions
 			var slippery_slippery_cm = new CANNON.ContactMaterial(slipperyMaterial, slipperyMaterial, {
 				friction: 0.1,
-				restitution: 2.5 // the bounce back of the collision
+				restitution: 2 // the bounce back of the collision
 			});
 
 			// We must add the contact materials to the world
