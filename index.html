@@ -42,20 +42,22 @@
 			const world = new CANNON.World();
 			world.gravity.set(0, -10, 0); // gravity pulls things down
 
+			// determines the shape of the level
+			const geometry = new THREE.BoxGeometry(6, 4, 6);
+			const physShape = new CANNON.Box(new CANNON.Vec3(3, 3, 2));
+
 			// create the cylinder
-			const geometry = new THREE.CylinderGeometry(3, 3, 2, 60);
 			const material = new THREE.MeshLambertMaterial( { color: 0x77ccff } );
-			const cylinder = new THREE.Mesh( geometry, material );
-			cylinder.receiveShadow = true;
-			scene.add( cylinder );
+			const stageMesh = new THREE.Mesh( geometry, material );
+			stageMesh.receiveShadow = true;
+			scene.add(stageMesh);
 
 			// create physics for cylinder
-			const cylinderShape = new CANNON.Cylinder(3, 3, 2, 30);
-			const cylinderMaterial = new CANNON.Material();
-			const cylinderBody = new CANNON.Body({mass: 0, material: cylinderMaterial})
-			cylinderBody.addShape(cylinderShape);
-			cylinderBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
-			world.add(cylinderBody);
+			const physMaterial = new CANNON.Material();
+			const physBody = new CANNON.Body({mass: 0, material: physMaterial})
+			physBody.addShape(physShape);
+			physBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
+			world.add(physBody);
 
 			// create player 1
 			const player1Geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
@@ -92,7 +94,7 @@
 			world.addBody(body2);
 
 			// create contact material behavior
-			const material_ground = new CANNON.ContactMaterial(cylinderMaterial, player1Material, {
+			const material_ground = new CANNON.ContactMaterial(physMaterial, player1Material, {
 				friction: 0.0, restitution: 0.3
 			});
 			world.addContactMaterial(material_ground);
