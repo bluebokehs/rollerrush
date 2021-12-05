@@ -1,43 +1,47 @@
+"use strict";
+exports.__esModule = true;
 //MIT License
 //Copyright (c) 2020-2021 Sean Bradley
-import * as THREE from './three.js';
-import * as CANNON from './cannon.js';
-class CannonUtils {
-    static CreateTrimesh(geometry) {
-        const vertices = geometry.attributes.position.array;
-        const indices = Object.keys(vertices).map(Number);
-        return new CANNON.Trimesh(vertices, indices);
+var THREE = require("three");
+var CANNON = require("cannon-es");
+var CannonUtils = /** @class */ (function () {
+    function CannonUtils() {
     }
-    static CreateConvexPolyhedron(geometry) {
-        const position = geometry.attributes.position;
-        const normal = geometry.attributes.normal;
-        const vertices = [];
-        for (let i = 0; i < position.count; i++) {
+    CannonUtils.CreateTrimesh = function (geometry) {
+        var vertices = geometry.attributes.position.array;
+        var indices = Object.keys(vertices).map(Number);
+        return new CANNON.Trimesh(vertices, indices);
+    };
+    CannonUtils.CreateConvexPolyhedron = function (geometry) {
+        var position = geometry.attributes.position;
+        var normal = geometry.attributes.normal;
+        var vertices = [];
+        for (var i = 0; i < position.count; i++) {
             vertices.push(new THREE.Vector3().fromBufferAttribute(position, i));
         }
-        const faces = [];
-        for (let i = 0; i < position.count; i += 3) {
-            const vertexNormals = normal === undefined
+        var faces = [];
+        for (var i = 0; i < position.count; i += 3) {
+            var vertexNormals = normal === undefined
                 ? []
                 : [
                     new THREE.Vector3().fromBufferAttribute(normal, i),
                     new THREE.Vector3().fromBufferAttribute(normal, i + 1),
                     new THREE.Vector3().fromBufferAttribute(normal, i + 2),
                 ];
-            const face = {
+            var face = {
                 a: i,
                 b: i + 1,
                 c: i + 2,
-                normals: vertexNormals,
+                normals: vertexNormals
             };
             faces.push(face);
         }
-        const verticesMap = {};
-        const points = [];
-        const changes = [];
-        for (let i = 0, il = vertices.length; i < il; i++) {
-            const v = vertices[i];
-            const key = Math.round(v.x * 100) +
+        var verticesMap = {};
+        var points = [];
+        var changes = [];
+        for (var i = 0, il = vertices.length; i < il; i++) {
+            var v = vertices[i];
+            var key = Math.round(v.x * 100) +
                 '_' +
                 Math.round(v.y * 100) +
                 '_' +
@@ -51,33 +55,33 @@ class CannonUtils {
                 changes[i] = changes[verticesMap[key]];
             }
         }
-        const faceIdsToRemove = [];
-        for (let i = 0, il = faces.length; i < il; i++) {
-            const face = faces[i];
+        var faceIdsToRemove = [];
+        for (var i = 0, il = faces.length; i < il; i++) {
+            var face = faces[i];
             face.a = changes[face.a];
             face.b = changes[face.b];
             face.c = changes[face.c];
-            const indices = [face.a, face.b, face.c];
-            for (let n = 0; n < 3; n++) {
+            var indices = [face.a, face.b, face.c];
+            for (var n = 0; n < 3; n++) {
                 if (indices[n] === indices[(n + 1) % 3]) {
                     faceIdsToRemove.push(i);
                     break;
                 }
             }
         }
-        for (let i = faceIdsToRemove.length - 1; i >= 0; i--) {
-            const idx = faceIdsToRemove[i];
+        for (var i = faceIdsToRemove.length - 1; i >= 0; i--) {
+            var idx = faceIdsToRemove[i];
             faces.splice(idx, 1);
         }
-        const cannonFaces = faces.map(function (f) {
+        var cannonFaces = faces.map(function (f) {
             return [f.a, f.b, f.c];
         });
         return new CANNON.ConvexPolyhedron({
             vertices: points,
-            faces: cannonFaces,
+            faces: cannonFaces
         });
-    }
-    static offsetCenterOfMass(body, centreOfMass) {
+    };
+    CannonUtils.offsetCenterOfMass = function (body, centreOfMass) {
         body.shapeOffsets.forEach(function (offset) {
             centreOfMass.vadd(offset, centreOfMass);
         });
@@ -85,9 +89,10 @@ class CannonUtils {
         body.shapeOffsets.forEach(function (offset) {
             offset.vsub(centreOfMass, offset);
         });
-        const worldCenterOfMass = new CANNON.Vec3();
+        var worldCenterOfMass = new CANNON.Vec3();
         body.vectorToWorldFrame(centreOfMass, worldCenterOfMass);
         body.position.vadd(worldCenterOfMass, body.position);
-    }
-}
-export default CannonUtils;
+    };
+    return CannonUtils;
+}());
+exports["default"] = CannonUtils;

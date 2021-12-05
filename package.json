@@ -2,7 +2,8 @@
   "requires": true,
   "lockfileVersion": 1,
   "dependencies": {
-    "three": "^0.135.0"
+    "three": "^0.135.0",
+    "three-to-cannon": "^4.0.2"
   },
   "devDependencies": {
     "cannon-es": "^0.18.0"
