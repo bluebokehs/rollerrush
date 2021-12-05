@@ -183,6 +183,9 @@
 			const sphere8 = new CANNON.Sphere(0.08);
 			body.addShape(sphere8, new CANNON.Vec3(-0.17, -0.17, -0.17));
 
+			const spherebody = new CANNON.Sphere(0.24);
+			body.addShape(spherebody);
+
 			const box1 = new CANNON.Box(
 				new CANNON.Vec3(0.25, 0.25, 0.25)
 			);
@@ -218,6 +221,9 @@
 			body2.addShape(sphere2_7, new CANNON.Vec3(0.17, -0.17, -0.17));
 			const sphere2_8 = new CANNON.Sphere(0.08);
 			body2.addShape(sphere2_8, new CANNON.Vec3(-0.17, -0.17, -0.17));
+			
+			const spherebody2 = new CANNON.Sphere(0.24);
+			body2.addShape(spherebody2);
 
 
 			const box2 = new CANNON.Box(
@@ -324,11 +330,12 @@
 				//console.log(player1.position.y);
 				//executeMoves();
 
-				// camera
 
 				cameraFocus = [(body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2];
-				camera.position.set(cameraOffset[0] + cameraFocus[0], cameraOffset[1] + cameraFocus[1], cameraOffset[2] + cameraFocus[2]);
-				
+				let cameraZoom = (((body2.position.x - body.position.x) * (body2.position.x - body.position.x)) + ((body2.position.z - body.position.z) * (body2.position.z - body.position.z)))/30;
+				camera.position.set(cameraOffset[0] + cameraFocus[0], (cameraOffset[1] + cameraFocus[1]) + cameraZoom * 1/4, cameraOffset[2] + cameraFocus[2] + cameraZoom * 1/2);
+				camera.updateProjectionMatrix();
+
 				if (body.position.y < -5 || body2.position.y < -5) {
 					reset();
 				}
