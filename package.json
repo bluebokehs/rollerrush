@@ -2,6 +2,8 @@
   "requires": true,
   "lockfileVersion": 1,
   "dependencies": {
+    "ca": "^0.1.9",
+    "cannon-es-debugger": "^0.1.4",
     "three": "^0.135.0"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 //MIT License
 //Copyright (c) 2020-2021 Sean Bradley
 import * as THREE from './three.js';
-import * as CANNON from './cannon.js';
+import * as CANNON from './cannon-es.js';
 class CannonUtils {
     static CreateTrimesh(geometry) {
         const vertices = geometry.attributes.position.array;

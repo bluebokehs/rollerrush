@@ -9,9 +9,9 @@
 	</head>
 	<body>
 		<script src="js/three.js"></script>
-		<script src="js/cannon.js"></script>
 		<script src="js/main.js"></script>
 		<script type="module">
+			import * as CANNON from './js/cannon-es.js'
 			//import CannonUtils from './js/cannonUtils.js';
 			import { OBJLoader } from 'https://cdn.skypack.dev/three@0.131.1/examples/jsm/loaders/OBJLoader.js';
 				
@@ -43,14 +43,8 @@
 			world.gravity.set(0, -10, 0); // gravity pulls things down
 			
 			
-			// create the cylinder
-			/*
-			const geometry = new THREE.CylinderGeometry(3, 3, 2, 60);
-			const material = new THREE.MeshLambertMaterial( { color: 0x77ccff } );
-			const cylinder = new THREE.Mesh( geometry, material );
-			cylinder.receiveShadow = true;
-			scene.add( cylinder );
-			*/
+			
+			
 			
 
 			var groundMaterial = new CANNON.Material("groundMaterial");
@@ -64,16 +58,22 @@
 				frictionEquationRegularizationTime: 3,
         	});
 
+			// create the cylinder
+			
+			const geometry = new THREE.CylinderGeometry(5, 5, 2, 60);
+			const material = new THREE.MeshLambertMaterial( { color: 0x77ccff } );
+			const cylinder = new THREE.Mesh( geometry, material );
+			cylinder.receiveShadow = true;
+			scene.add( cylinder );
 			
 			// create physics for cylinder
-			/*
-			const cylinderShape = new CANNON.Cylinder(3, 3, 2, 30);
-			const cylinderMaterial = groundMaterial;
+			
+			const cylinderShape = new CANNON.Cylinder(5, 5, 2, 60);
 			const cylinderBody = new CANNON.Body({mass: 0, material: groundMaterial})
 			cylinderBody.addShape(cylinderShape);
-			cylinderBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
-			world.add(cylinderBody);
-			*/
+			
+			world.addBody(cylinderBody);
+			
 
 
 			// Create a slippery material (friction coefficient = 0.0)
@@ -94,7 +94,7 @@
 			// We want to have a heavy impact on player collisions
 			var slippery_slippery_cm = new CANNON.ContactMaterial(slipperyMaterial, slipperyMaterial, {
 				friction: 0.1,
-				restitution: 2 // the bounce back of the collision
+				restitution: 3 // the bounce back of the collision
 			});
 
 			// We must add the contact materials to the world
@@ -106,14 +106,14 @@
 			var levelLoaded = false;
 			const objLoader = new OBJLoader();
 			objLoader.load(
-                'maps/monkey.obj',
+                'maps/level1.obj',
                 (object) => {
                     scene.add(object)
 					
                     levelMesh = object.children[0]
                     levelMesh.material = new THREE.MeshNormalMaterial()
 					levelMesh.position.x = 0;
-					levelMesh.position.y = 0;
+					levelMesh.position.y = 3;
 
 					const vertices = levelMesh.geometry.attributes.position.array;
         			const indices = Object.keys(vertices).map(Number);			
@@ -123,7 +123,7 @@
                     
 					console.log(levelShape);
 
-					levelBody = new CANNON.Body({ mass: 0 })
+					levelBody = new CANNON.Body({ mass: 1, material: groundMaterial })
                     levelBody.addShape(levelShape)
                     levelBody.position.x = levelMesh.position.x
                     levelBody.position.y = levelMesh.position.y
@@ -140,7 +140,20 @@
                     console.log('An error happened ' + error)
                 }
             )
-			
+
+			/*
+			const planeGeometry = new THREE.PlaneGeometry(25, 25)
+            const planeMesh = new THREE.Mesh(planeGeometry, groundMaterial)
+            planeMesh.position.y = -0.01
+            planeMesh.rotateX(-Math.PI / 2)
+            planeMesh.receiveShadow = true
+            scene.add(planeMesh)
+            const planeShape = new CANNON.Plane()
+            const planeBody = new CANNON.Body({ mass: 0 })
+            planeBody.addShape(planeShape)
+            planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
+            world.addBody(planeBody)
+			*/
 
 			// create player 1
 			const player1Geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
@@ -151,11 +164,19 @@
 			scene.add(player1);
 
 			// create physics for player 1
-			const shape = new CANNON.Box(
-				new CANNON.Vec3(0.25, 0.25, 0.25)
-			);
 			const body = new CANNON.Body({mass: 1, material: slipperyMaterial});
-			body.addShape(shape);
+			const topPlane = new CANNON.Plane();
+			topPlane.boundingSphereRadius = 0.25;
+			body.addShape(topPlane, new CANNON.Vec3(0, 0.125, 0), new CANNON.Quaternion(-Math.PI / 2, 0, 0));
+			const botPlane = new CANNON.Plane();
+			botPlane.boundingSphereRadius = 0.25;
+			body.addShape(botPlane, new CANNON.Vec3(0, -0.125, 0), new CANNON.Quaternion(Math.PI / 2, 0, 0));
+			const lefPlane = new CANNON.Plane();
+			lefPlane.boundingSphereRadius = 0.25;
+			body.addShape(lefPlane, new CANNON.Vec3(-0.125, 0, 0), new CANNON.Quaternion(0, -Math.PI / 2, 0));
+			const rigPlane = new CANNON.Plane();
+			rigPlane.boundingSphereRadius = 0.25;
+			body.addShape(rigPlane, new CANNON.Vec3(0.125, 0, 0), new CANNON.Quaternion(0, Math.PI / 2, 0));
 			body.position.set(-1, 3, 0);
 			
 
@@ -174,7 +195,7 @@
 			const body2 = new CANNON.Body({mass: 1, material: slipperyMaterial});
 			body2.addShape(shape2);
 			body2.position.set(1, 3, 0);
-			
+
 			world.addBody(body);
 			world.addBody(body2);
 
@@ -222,37 +243,45 @@
 				// player 1
 				if (keyName == 'w') {
 					// move player forwards
-					body.applyForce(new CANNON.Vec3(0, 0, -180), body.position);
+					// body.applyForce(new CANNON.Vec3(0, 0, -180), body.position);
+					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z - 180);
 				}
 				if (keyName == 's') {
 					// move player backwards
-					body.applyForce(new CANNON.Vec3(0, 0, 180), body.position);
+					// body.applyForce(new CANNON.Vec3(0, 0, 180), body.position);
+					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z + 180);
 				}
 				if (keyName == 'a') {
 					// move player left
-					body.applyForce(new CANNON.Vec3(-180, 0, 0), body.position);
+					// body.applyForce(new CANNON.Vec3(-180, 0, 0), body.position);
+					body.force = new CANNON.Vec3(body.force.x - 180, body.force.y, body.force.z);
 				}
 				if (keyName == 'd') {
 					// move player right
-					body.applyForce(new CANNON.Vec3(180, 0, 0), body.position);
+					// body.applyForce(new CANNON.Vec3(180, 0, 0), body.position);
+					body.force = new CANNON.Vec3(body.force.x + 180, body.force.y, body.force.z);
 				}
 
 				// player 2
 				if (keyName == 'ArrowUp') {
 					// move player forwards
-					body2.applyForce(new CANNON.Vec3(0, 0, -180), body2.position);
+					// body2.applyForce(new CANNON.Vec3(0, 0, -180), body2.position);
+					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z - 180);
 				}
 				if (keyName == 'ArrowDown') {
 					// move player backwards
-					body2.applyForce(new CANNON.Vec3(0, 0, 180), body2.position);
+					// body2.applyForce(new CANNON.Vec3(0, 0, 180), body2.position);
+					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z + 180);
 				}
 				if (keyName == 'ArrowLeft') {
 					// move player left
-					body2.applyForce(new CANNON.Vec3(-200, 0, 0), body2.position);
+					// body2.applyForce(new CANNON.Vec3(-180, 0, 0), body2.position);
+					body2.force = new CANNON.Vec3(body2.force.x - 180, body2.force.y, body2.force.z);
 				}
 				if (keyName == 'ArrowRight') {
 					// move player right
-					body2.applyForce(new CANNON.Vec3(200, 0, 0), body2.position);
+					// body2.applyForce(new CANNON.Vec3(180, 0, 0), body2.position);
+					body2.force = new CANNON.Vec3(body2.force.x + 180, body2.force.y, body2.force.z);
 				}
 			})
 
@@ -290,6 +319,20 @@
 					body2.quaternion.z,
 					body2.quaternion.w
 				);
+
+				if (levelLoaded) {
+                    levelMesh.position.set(
+                        levelBody.position.x,
+                        levelBody.position.y,
+                        levelBody.position.z
+                    )
+                    levelMesh.quaternion.set(
+                        levelBody.quaternion.x,
+                        levelBody.quaternion.y,
+                        levelBody.quaternion.z,
+                        levelBody.quaternion.w
+                    )
+                }
 			};
 
 			// draw Scene
