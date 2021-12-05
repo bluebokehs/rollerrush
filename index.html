@@ -93,8 +93,8 @@
 
 			// We want to have a heavy impact on player collisions
 			var slippery_slippery_cm = new CANNON.ContactMaterial(slipperyMaterial, slipperyMaterial, {
-				friction: 0.1,
-				restitution: 3 // the bounce back of the collision
+				friction: 0.01,
+				restitution: 2.5 // the bounce back of the collision
 			});
 
 			// We must add the contact materials to the world
