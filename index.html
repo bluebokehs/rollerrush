@@ -82,7 +82,7 @@
 			// The ContactMaterial defines what happens when two materials meet.
 			// In this case we want friction coefficient = 0.0 when the slippery material touches ground.
 			var slippery_ground_cm = new CANNON.ContactMaterial(groundMaterial, slipperyMaterial, {
-				friction: 0.00018,
+				friction: 0.0002,
 				restitution: 0.15,
 				contactEquationStiffness: 1e8,
 				contactEquationRelaxation: 3
@@ -106,7 +106,7 @@
 			var levelLoaded = false;
 			const objLoader = new OBJLoader();
 			objLoader.load(
-                'maps/level1.obj',
+                'maps/level2.obj',
                 (object) => {
                     scene.add(object)
 					
@@ -327,16 +327,12 @@
 
 			// game logic
 			const update = function () {
-				//console.log(player1.position.y);
-				//executeMoves();
-
-
 				cameraFocus = [(body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2];
 				let cameraZoom = (((body2.position.x - body.position.x) * (body2.position.x - body.position.x)) + ((body2.position.z - body.position.z) * (body2.position.z - body.position.z)))/30;
 				camera.position.set(cameraOffset[0] + cameraFocus[0], (cameraOffset[1] + cameraFocus[1]) + cameraZoom * 1/4, cameraOffset[2] + cameraFocus[2] + cameraZoom * 1/2);
 				camera.updateProjectionMatrix();
 
-				if (body.position.y < -5 || body2.position.y < -5) {
+				if (body.position.y < -8 || body2.position.y < -8) {
 					reset();
 				}
 
