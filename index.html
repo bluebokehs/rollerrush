@@ -359,25 +359,25 @@
 				if (keyName == 'w') {
 					// move player forwards
 					// body.applyForce(new CANNON.Vec3(0, 0, -180), body.position);
-					let bonus = Math.max(body.velocity.z * 100, 0)
+					let bonus = Math.max(body.velocity.z * 10, 0)
 					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z - (bonus + 180));
 				}
 				if (keyName == 's') {
 					// move player backwards
 					// body.applyForce(new CANNON.Vec3(0, 0, 180), body.position);
-					let bonus = Math.max(-1 * body.velocity.z * 100, 0)
+					let bonus = Math.max(-1 * body.velocity.z * 10, 0)
 					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z + (bonus + 180));
 				}
 				if (keyName == 'a') {
 					// move player left
 					// body.applyForce(new CANNON.Vec3(-180, 0, 0), body.position);
-					let bonus = Math.max(body.velocity.x * 100, 0)
+					let bonus = Math.max(body.velocity.x * 10, 0)
 					body.force = new CANNON.Vec3(body.force.x - (bonus + 180), body.force.y, body.force.z);
 				}
 				if (keyName == 'd') {
 					// move player right
 					// body.applyForce(new CANNON.Vec3(180, 0, 0), body.position);
-					let bonus = Math.max(-1 * body.velocity.x * 100, 0)
+					let bonus = Math.max(-1 * body.velocity.x * 10, 0)
 					body.force = new CANNON.Vec3(body.force.x + (bonus + 180), body.force.y, body.force.z);
 				}
 
@@ -385,25 +385,25 @@
 				if (keyName == 'ArrowUp') {
 					// move player forwards
 					// body2.applyForce(new CANNON.Vec3(0, 0, -180), body2.position);
-					let bonus = Math.max(body2.velocity.z * 100, 0)
+					let bonus = Math.max(body2.velocity.z * 10, 0)
 					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z - (bonus + 180));
 				}
 				if (keyName == 'ArrowDown') {
 					// move player backwards
 					// body2.applyForce(new CANNON.Vec3(0, 0, 180), body2.position);
-					let bonus = Math.max(-1 * body2.velocity.z * 100, 0)
+					let bonus = Math.max(-1 * body2.velocity.z * 10, 0)
 					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z + (bonus + 180));
 				}
 				if (keyName == 'ArrowLeft') {
 					// move player left
 					// body2.applyForce(new CANNON.Vec3(-180, 0, 0), body2.position);
-					let bonus = Math.max(body2.velocity.x * 100, 0)
+					let bonus = Math.max(body2.velocity.x * 10, 0)
 					body2.force = new CANNON.Vec3(body2.force.x - (bonus + 180), body2.force.y, body2.force.z);
 				}
 				if (keyName == 'ArrowRight') {
 					// move player right
 					// body2.applyForce(new CANNON.Vec3(180, 0, 0), body2.position);
-					let bonus = Math.max(-1 * body2.velocity.x * 100, 0)
+					let bonus = Math.max(-1 * body2.velocity.x * 10, 0)
 					body2.force = new CANNON.Vec3(body2.force.x + (bonus + 180), body2.force.y, body2.force.z);
 				}
 			})
