@@ -4,28 +4,35 @@
 		<meta charset="utf-8">
 		<title>My first three.js app</title>
 		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Outfit&display=swap');
 			body { margin: 0; }
 		</style>
 	</head>
-	<body>
+	<body scroll="no" style="overflow: hidden">
 		<script src="js/three.js"></script>
-		<script src="js/main.js"></script>
 		<script type="module">
 			import * as CANNON from './js/cannon-es.js'
 			//import CannonUtils from './js/cannonUtils.js';
 			import { OBJLoader } from 'https://cdn.skypack.dev/three@0.131.1/examples/jsm/loaders/OBJLoader.js';
+
+			import { CSS2DRenderer, CSS2DObject } from './js/CSS2DRenderer.js';
 				
 			const scene = new THREE.Scene();
+			const winScene = new THREE.Scene();
+			var currentScene = null;
 
 			let cameraFocus = [0, 0, 0];
 			let cameraOffset = [0, 0, 0];
 			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			
+			const winCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			var currentCamera = null;
+
 			// orthographic camera
 			//const theHeight = 10 * (window.innerHeight / window.innerWidth);
 			//const camera = new THREE.OrthographicCamera(-5, 5, theHeight/ 2, theHeight / -2, 0.1, 1000);
 
 			const renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
 			document.body.appendChild( renderer.domElement );
@@ -34,8 +41,11 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 				renderer.setSize(width, height);
+				labelRenderer.setSize(width, height);
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
+				winCamera.aspect = width / height;
+				winCamera.updateProjectionMatrix();
 			});
 
 			// intitialize CannonJS
@@ -99,7 +109,6 @@
 
 			// We must add the contact materials to the world
 			world.addContactMaterial(slippery_slippery_cm);
-            
 			
 			var levelMesh;
 			var levelBody;
@@ -156,7 +165,7 @@
 			*/
 
 			// create player 1
-			const player1Geometry = new THREE.SphereGeometry(0.5, 20, 20);
+			const player1Geometry = new THREE.SphereGeometry(0.5, 25, 25);
 			const player1Material = new THREE.MeshLambertMaterial({color:0xff9999});
 			const player1 = new THREE.Mesh(player1Geometry, player1Material);
 			player1.castShadow = true;
@@ -174,10 +183,9 @@
 			body.addShape(box1);
 
 			body.position.set(-1, 3, 0);
-			
 
 			// create player 2
-			const player2Geometry = new THREE.SphereGeometry(0.5, 20, 20);
+			const player2Geometry = new THREE.SphereGeometry(0.5, 25, 25);
 			const player2Material = new THREE.MeshLambertMaterial({color:0x99ff99});
 			const player2 = new THREE.Mesh(player2Geometry, player2Material);
 			player2.castShadow = true;
@@ -188,17 +196,65 @@
 			const body2 = new CANNON.Body({mass: 1, material: slipperyMaterial});
 			const spherebody2 = new CANNON.Sphere(0.5);
 			body2.addShape(spherebody2);
-
-
-			const box2 = new CANNON.Box(
-				new CANNON.Vec3(0.25, 0.25, 0.25)
-			);
-			body2.addShape(box2);
 			
 			body2.position.set(1, 3, 0);
 
 			world.addBody(body);
 			world.addBody(body2);
+
+
+
+			// ui
+			var score = 0;
+			var scoreDiv = document.createElement('div');
+			scoreDiv.className = 'label';
+			scoreDiv.textContent = 'Red: ' + score;
+			scoreDiv.style.fontFamily = 'Outfit';
+			scoreDiv.style.color = 'white';
+			scoreDiv.style.fontSize = '30px';
+			var ui = new CSS2DObject(scoreDiv);
+			ui.position.set(0, 1, 0);
+			scene.add(ui);
+
+			var score2 = 0;
+			var score2Div = document.createElement('div');
+			score2Div.className = 'label';
+			score2Div.textContent = 'Green: ' + score;
+			score2Div.style.fontFamily = 'Outfit';
+			score2Div.style.color = 'white';
+			score2Div.style.fontSize = '30px';
+			var ui2 = new CSS2DObject(score2Div);
+			ui2.position.set(0, 1, 0);
+			scene.add(ui2);
+
+			// win text
+			var winner = null;
+			var winnerDiv = document.createElement('div');
+			winnerDiv.className = 'label';
+			winnerDiv.textContent = ' ';
+			winnerDiv.style.fontFamily = 'Outfit';
+			winnerDiv.style.color = 'white';
+			winnerDiv.style.fontSize = '100px';
+			var winnerUI = new CSS2DObject(winnerDiv);
+			winnerUI.position.set(0, 1, 0);
+			scene.add(winnerUI);
+
+			var winner2Div = document.createElement('div');
+			winner2Div.className = 'label';
+			winner2Div.textContent = ' ';
+			winner2Div.style.fontFamily = 'Outfit';
+			winner2Div.style.color = 'white';
+			winner2Div.style.fontSize = '30px';
+			var winnerUI2 = new CSS2DObject(winner2Div);
+			winnerUI2.position.set(0, 1, 0);
+			scene.add(winnerUI2);
+
+			let labelRenderer = new CSS2DRenderer();
+			labelRenderer.setSize(window.innerWidth, window.innerHeight);
+			labelRenderer.domElement.style.top = '0px';
+			document.body.appendChild(labelRenderer.domElement);
+
+
 
 			// create skybox
 			const cubeGeometry = new THREE.BoxGeometry(1000, 1000, 1000);
@@ -232,6 +288,8 @@
 			camera.position.y = 8;
 			camera.position.x = 0;
 			camera.lookAt((body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2);
+			
+			
 
 			// set camera offset
 			cameraOffset[0] = camera.position.x - (body2.position.x + body.position.x)/2;
@@ -240,6 +298,17 @@
 
 			document.addEventListener('keyup', (event) => {
 				const keyName = event.key;
+
+				if (isDone && keyName == 'r') {
+					score = 0;
+					score2 = 0;
+					isDone = false;
+					winnerDiv.textContent = ' ';
+					winner2Div.textContent = ' ';
+					scoreDiv.textContent = 'Red: ' + score;
+					score2Div.textContent = 'Green: ' + score;
+					reset();
+				}
 
 				// player 1
 				if (keyName == 'w') {
@@ -286,18 +355,62 @@
 				}
 			})
 
+			var isDone = false;
+
+			currentScene = scene;
+			currentCamera = camera;
+
 			const clock = new THREE.Clock();
 			let delta;
 
 			// game logic
 			const update = function () {
-				cameraFocus = [(body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2];
-				let cameraZoom = (((body2.position.x - body.position.x) * (body2.position.x - body.position.x)) + ((body2.position.z - body.position.z) * (body2.position.z - body.position.z)))/30;
-				camera.position.set(cameraOffset[0] + cameraFocus[0], (cameraOffset[1] + cameraFocus[1]) + cameraZoom * 1/4, cameraOffset[2] + cameraFocus[2] + cameraZoom * 1/2);
-				camera.updateProjectionMatrix();
+				if (score < 5 && score2 < 5) {
+					cameraFocus = [(body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2];
+					let cameraZoom = (((body2.position.x - body.position.x) * (body2.position.x - body.position.x)) + ((body2.position.z - body.position.z) * (body2.position.z - body.position.z)))/30;
+					camera.position.set(cameraOffset[0] + cameraFocus[0], (cameraOffset[1] + cameraFocus[1]) + cameraZoom * 1/4, cameraOffset[2] + cameraFocus[2] + cameraZoom * 1/2);
+					camera.updateProjectionMatrix();
+				}
+				
+				
+				ui.position.set(camera.position.x - 0.4, camera.position.y + 0.37, camera.position.z - 1);
+				ui2.position.set(camera.position.x + 0.4, camera.position.y + 0.37, camera.position.z - 1);
+				winnerUI.position.set(camera.position.x, camera.position.y + 0.25, camera.position.z - 1);
+				winnerUI2.position.set(camera.position.x, camera.position.y + 0.2, camera.position.z - 1);
+				
 
-				if (body.position.y < -8 || body2.position.y < -8) {
+				// determines who wins the round
+				if (body.position.y < -8) {
+					score2++;
+					score2Div.textContent = 'Green: ' + score2;
 					reset();
+				} else if (body2.position.y < -8) {
+					score++;
+					scoreDiv.textContent = 'Red: ' + score;
+					reset();
+				}
+
+				// determines who wins the match
+				if (score >= 5) {
+					winner = "Red";
+					winnerDiv.textContent = winner + ' wins!';
+					winner2Div.textContent = 'Press R to restart.';
+					scoreDiv.textContent = ' ';
+					score2Div.textContent = ' ';
+					camera.position.z = 5;
+					camera.position.y = 7;
+					camera.position.x = 0;
+					isDone = true;
+				} else if (score2 >= 5) {
+					winner = "Green";
+					winnerDiv.textContent = winner + ' wins!';
+					winner2Div.textContent = 'Press R to restart.';
+					scoreDiv.textContent = ' ';
+					score2Div.textContent = ' ';
+					camera.position.z = 5;
+					camera.position.y = 7;
+					camera.position.x = 0;
+					isDone = true;
 				}
 
 				// update three.js player 1
@@ -335,7 +448,8 @@
 
 			// draw Scene
 			const render = function () {
-				renderer.render( scene, camera );
+				renderer.render(scene, camera);
+				labelRenderer.render(scene, camera);
 			};
 
 			//resets players to original positions

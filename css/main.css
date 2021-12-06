@@ -1,6 +1,7 @@
 body {
     margin: 0px;
-    height: 100vh;
+    height: 100%;
+    overflow-x: hidden;
 }
 canvas {
     display: block;
@@ -14,4 +15,9 @@ canvas {
     z-index: 100; 
     display:block; 
     background-color: transparent;
+}
+
+.label {
+    color: #fff;
+    z-index: 10;
 }
