@@ -92,7 +92,7 @@
 			// The ContactMaterial defines what happens when two materials meet.
 			// In this case we want friction coefficient = 0.0 when the slippery material touches ground.
 			var slippery_ground_cm = new CANNON.ContactMaterial(groundMaterial, slipperyMaterial, {
-				friction: 0.02,
+				friction: 0.2,
 				restitution: 0.15,
 				contactEquationStiffness: 1e8,
 				contactEquationRelaxation: 3
@@ -205,10 +205,10 @@
 
 
 			// ui
-			var score = 0;
+			var score = 6;
 			var scoreDiv = document.createElement('div');
 			scoreDiv.className = 'label';
-			scoreDiv.textContent = 'Red: ' + score;
+			scoreDiv.textContent = ' ';
 			scoreDiv.style.fontFamily = 'Outfit';
 			scoreDiv.style.color = 'white';
 			scoreDiv.style.fontSize = '30px';
@@ -216,10 +216,10 @@
 			ui.position.set(0, 1, 0);
 			scene.add(ui);
 
-			var score2 = 0;
+			var score2 = 6;
 			var score2Div = document.createElement('div');
 			score2Div.className = 'label';
-			score2Div.textContent = 'Green: ' + score;
+			score2Div.textContent = ' ';
 			score2Div.style.fontFamily = 'Outfit';
 			score2Div.style.color = 'white';
 			score2Div.style.fontSize = '30px';
@@ -231,7 +231,7 @@
 			var winner = null;
 			var winnerDiv = document.createElement('div');
 			winnerDiv.className = 'label';
-			winnerDiv.textContent = ' ';
+			winnerDiv.textContent = 'Roller Rush';
 			winnerDiv.style.fontFamily = 'Outfit';
 			winnerDiv.style.color = 'white';
 			winnerDiv.style.fontSize = '100px';
@@ -241,7 +241,7 @@
 
 			var winner2Div = document.createElement('div');
 			winner2Div.className = 'label';
-			winner2Div.textContent = ' ';
+			winner2Div.textContent = 'Press Enter to start!';
 			winner2Div.style.fontFamily = 'Outfit';
 			winner2Div.style.color = 'white';
 			winner2Div.style.fontSize = '30px';
@@ -289,7 +289,8 @@
 			camera.position.x = 0;
 			camera.lookAt((body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2);
 			
-			
+			var isDone = false;
+			var isStart = true;
 
 			// set camera offset
 			cameraOffset[0] = camera.position.x - (body2.position.x + body.position.x)/2;
@@ -310,29 +311,40 @@
 					reset();
 				}
 
+				if (isStart && keyName == 'Enter') {
+					score = 0;
+					score2 = 0;
+					isStart = false;
+					winnerDiv.textContent = ' ';
+					winner2Div.textContent = ' ';
+					scoreDiv.textContent = 'Red: ' + score;
+					score2Div.textContent = 'Green: ' + score;
+					reset();
+				}
+
 				// player 1
 				if (keyName == 'w') {
 					// move player forwards
 					// body.applyForce(new CANNON.Vec3(0, 0, -180), body.position);
-					let bonus = Math.min(body.velocity.z / 3, 0)
+					let bonus = Math.max(body.velocity.z * 10, 0)
 					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z - (bonus + 180));
 				}
 				if (keyName == 's') {
 					// move player backwards
 					// body.applyForce(new CANNON.Vec3(0, 0, 180), body.position);
-					let bonus = Math.min(-1 * body.velocity.z / 3, 0)
+					let bonus = Math.min(-1 * body.velocity.z * 10, 0)
 					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z + (bonus + 180));
 				}
 				if (keyName == 'a') {
 					// move player left
 					// body.applyForce(new CANNON.Vec3(-180, 0, 0), body.position);
-					let bonus = Math.min(body.velocity.x / 3, 0)
+					let bonus = Math.max(body.velocity.x * 10, 0)
 					body.force = new CANNON.Vec3(body.force.x - (bonus + 180), body.force.y, body.force.z);
 				}
 				if (keyName == 'd') {
 					// move player right
 					// body.applyForce(new CANNON.Vec3(180, 0, 0), body.position);
-					let bonus = Math.min(-1 * body.velocity.x / 3, 0)
+					let bonus = Math.min(-1 * body.velocity.x * 10, 0)
 					body.force = new CANNON.Vec3(body.force.x + (bonus + 180), body.force.y, body.force.z);
 				}
 
@@ -340,26 +352,30 @@
 				if (keyName == 'ArrowUp') {
 					// move player forwards
 					// body2.applyForce(new CANNON.Vec3(0, 0, -180), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z - 180);
+					let bonus = Math.max(body2.velocity.z * 10, 0)
+					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z - (bonus + 180));
 				}
 				if (keyName == 'ArrowDown') {
 					// move player backwards
 					// body2.applyForce(new CANNON.Vec3(0, 0, 180), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z + 180);
+					let bonus = Math.min(-1 * body2.velocity.z * 10, 0)
+					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z + (bonus + 180));
 				}
 				if (keyName == 'ArrowLeft') {
 					// move player left
 					// body2.applyForce(new CANNON.Vec3(-180, 0, 0), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x - 180, body2.force.y, body2.force.z);
+					let bonus = Math.max(body2.velocity.x * 10, 0)
+					body2.force = new CANNON.Vec3(body2.force.x - (bonus + 180), body2.force.y, body2.force.z);
 				}
 				if (keyName == 'ArrowRight') {
 					// move player right
 					// body2.applyForce(new CANNON.Vec3(180, 0, 0), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x + 180, body2.force.y, body2.force.z);
+					let bonus = Math.min(-1 * body2.velocity.x * 10, 0)
+					body2.force = new CANNON.Vec3(body2.force.x + (bonus + 180), body2.force.y, body2.force.z);
 				}
 			})
 
-			var isDone = false;
+			
 
 			currentScene = scene;
 			currentCamera = camera;
@@ -369,7 +385,7 @@
 
 			// game logic
 			const update = function () {
-				if (score < 5 && score2 < 5) {
+				if ((score < 5 && score2 < 5) || !isStart) {
 					cameraFocus = [(body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2];
 					let cameraZoom = (((body2.position.x - body.position.x) * (body2.position.x - body.position.x)) + ((body2.position.z - body.position.z) * (body2.position.z - body.position.z)))/30;
 					camera.position.set(cameraOffset[0] + cameraFocus[0], (cameraOffset[1] + cameraFocus[1]) + cameraZoom * 1/4, cameraOffset[2] + cameraFocus[2] + cameraZoom * 1/2);
