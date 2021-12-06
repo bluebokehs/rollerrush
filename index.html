@@ -165,7 +165,7 @@
 
 			// create physics for player 1
 			const body = new CANNON.Body({mass: 1, material: slipperyMaterial});
-			const spherebody = new CANNON.Sphere(0.25);
+			const spherebody = new CANNON.Sphere(0.5);
 			body.addShape(spherebody);
 
 			const box1 = new CANNON.Box(
@@ -186,7 +186,7 @@
 
 			// create physics for player 2
 			const body2 = new CANNON.Body({mass: 1, material: slipperyMaterial});
-			const spherebody2 = new CANNON.Sphere(0.25);
+			const spherebody2 = new CANNON.Sphere(0.5);
 			body2.addShape(spherebody2);
 
 
@@ -267,22 +267,22 @@
 				if (keyName == 'ArrowUp') {
 					// move player forwards
 					// body2.applyForce(new CANNON.Vec3(0, 0, -180), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z - 180);
+					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z - 100);
 				}
 				if (keyName == 'ArrowDown') {
 					// move player backwards
 					// body2.applyForce(new CANNON.Vec3(0, 0, 180), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z + 180);
+					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z + 100);
 				}
 				if (keyName == 'ArrowLeft') {
 					// move player left
 					// body2.applyForce(new CANNON.Vec3(-180, 0, 0), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x - 180, body2.force.y, body2.force.z);
+					body2.force = new CANNON.Vec3(body2.force.x - 100, body2.force.y, body2.force.z);
 				}
 				if (keyName == 'ArrowRight') {
 					// move player right
 					// body2.applyForce(new CANNON.Vec3(180, 0, 0), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x + 180, body2.force.y, body2.force.z);
+					body2.force = new CANNON.Vec3(body2.force.x + 100, body2.force.y, body2.force.z);
 				}
 			})
 
