@@ -454,7 +454,7 @@
 				}
 
 				// determines who wins the match
-				if (score >= 5) {
+				if (score >= 5 && !isStart) {
 					winner = "Red";
 					winnerDiv.textContent = winner + ' wins!';
 					winner2Div.textContent = 'Press R to restart.';
@@ -464,7 +464,7 @@
 					camera.position.y = 7;
 					camera.position.x = 0;
 					isDone = true;
-				} else if (score2 >= 5) {
+				} else if (score2 >= 5 && !isStart) {
 					winner = "Green";
 					winnerDiv.textContent = winner + ' wins!';
 					winner2Div.textContent = 'Press R to restart.';
