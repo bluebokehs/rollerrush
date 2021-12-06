@@ -205,7 +205,7 @@
 
 
 			// ui
-			var score = 6;
+			var score = 0;
 			var scoreDiv = document.createElement('div');
 			scoreDiv.className = 'label';
 			scoreDiv.textContent = ' ';
@@ -216,7 +216,7 @@
 			ui.position.set(0, 1, 0);
 			scene.add(ui);
 
-			var score2 = 6;
+			var score2 = 0;
 			var score2Div = document.createElement('div');
 			score2Div.className = 'label';
 			score2Div.textContent = ' ';
@@ -377,7 +377,7 @@
 
 			// game logic
 			const update = function () {
-				if ((score < 5 && score2 < 5) || !isStart) {
+				if (!isStart && !isDone) {
 					cameraFocus = [(body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2];
 					let cameraZoom = (((body2.position.x - body.position.x) * (body2.position.x - body.position.x)) + ((body2.position.z - body.position.z) * (body2.position.z - body.position.z)))/30;
 					camera.position.set(cameraOffset[0] + cameraFocus[0], (cameraOffset[1] + cameraFocus[1]) + cameraZoom * 1/4, cameraOffset[2] + cameraFocus[2] + cameraZoom * 1/2);
