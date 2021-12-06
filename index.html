@@ -92,7 +92,7 @@
 			// The ContactMaterial defines what happens when two materials meet.
 			// In this case we want friction coefficient = 0.0 when the slippery material touches ground.
 			var slippery_ground_cm = new CANNON.ContactMaterial(groundMaterial, slipperyMaterial, {
-				friction: 0.02,
+				friction: 0.002,
 				restitution: 0.15,
 				contactEquationStiffness: 1e8,
 				contactEquationRelaxation: 3
@@ -104,7 +104,7 @@
 			// We want to have a heavy impact on player collisions
 			var slippery_slippery_cm = new CANNON.ContactMaterial(slipperyMaterial, slipperyMaterial, {
 				friction: 0.01,
-				restitution: 2.5 // the bounce back of the collision
+				restitution: 2 // the bounce back of the collision
 			});
 
 			// We must add the contact materials to the world
@@ -314,44 +314,44 @@
 				if (keyName == 'w') {
 					// move player forwards
 					// body.applyForce(new CANNON.Vec3(0, 0, -180), body.position);
-					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z - 100);
+					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z - 180);
 				}
 				if (keyName == 's') {
 					// move player backwards
 					// body.applyForce(new CANNON.Vec3(0, 0, 180), body.position);
-					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z + 100);
+					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z + 180);
 				}
 				if (keyName == 'a') {
 					// move player left
 					// body.applyForce(new CANNON.Vec3(-180, 0, 0), body.position);
-					body.force = new CANNON.Vec3(body.force.x - 100, body.force.y, body.force.z);
+					body.force = new CANNON.Vec3(body.force.x - 180, body.force.y, body.force.z);
 				}
 				if (keyName == 'd') {
 					// move player right
 					// body.applyForce(new CANNON.Vec3(180, 0, 0), body.position);
-					body.force = new CANNON.Vec3(body.force.x + 100, body.force.y, body.force.z);
+					body.force = new CANNON.Vec3(body.force.x + 180, body.force.y, body.force.z);
 				}
 
 				// player 2
 				if (keyName == 'ArrowUp') {
 					// move player forwards
 					// body2.applyForce(new CANNON.Vec3(0, 0, -180), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z - 100);
+					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z - 180);
 				}
 				if (keyName == 'ArrowDown') {
 					// move player backwards
 					// body2.applyForce(new CANNON.Vec3(0, 0, 180), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z + 100);
+					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z + 180);
 				}
 				if (keyName == 'ArrowLeft') {
 					// move player left
 					// body2.applyForce(new CANNON.Vec3(-180, 0, 0), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x - 100, body2.force.y, body2.force.z);
+					body2.force = new CANNON.Vec3(body2.force.x - 180, body2.force.y, body2.force.z);
 				}
 				if (keyName == 'ArrowRight') {
 					// move player right
 					// body2.applyForce(new CANNON.Vec3(180, 0, 0), body2.position);
-					body2.force = new CANNON.Vec3(body2.force.x + 100, body2.force.y, body2.force.z);
+					body2.force = new CANNON.Vec3(body2.force.x + 180, body2.force.y, body2.force.z);
 				}
 			})
 
