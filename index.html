@@ -11,9 +11,10 @@
 		<script src="js/three.js"></script>
 		<script src="js/main.js"></script>
 		<script type="module">
-			import * as CANNON from './js/cannon-es.js'
+			import * as CANNON from './js/cannon-es.js';
 			//import CannonUtils from './js/cannonUtils.js';
 			import { OBJLoader } from 'https://cdn.skypack.dev/three@0.131.1/examples/jsm/loaders/OBJLoader.js';
+			import { CSS2DRenderer, CSS2DObject } from './js/CSS2DRenderer';
 				
 			const scene = new THREE.Scene();
 
@@ -100,6 +101,17 @@
 			// We must add the contact materials to the world
 			world.addContactMaterial(slippery_slippery_cm);
             
+
+			// UI
+			var score = 0;
+			var scoreDiv = document.createElement('div');
+			scoreDiv.className = 'label';
+			scoreDiv.textContent = 'Red: ' + score;
+			var ui = new CSS2DObject(scoreDiv);
+			ui.position.set(0, 10, 0);
+			scene.add(ui);
+
+			
 			
 			var levelMesh;
 			var levelBody;
