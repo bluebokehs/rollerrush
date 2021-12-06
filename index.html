@@ -249,6 +249,36 @@
 			winnerUI2.position.set(0, 1, 0);
 			scene.add(winnerUI2);
 
+			var startDiv = document.createElement('div');
+			startDiv.className = 'label';
+			startDiv.textContent = 'Roller';
+			startDiv.style.fontFamily = 'Outfit';
+			startDiv.style.color = '#FF9999';
+			startDiv.style.fontSize = '100px';
+			var startUI = new CSS2DObject(startDiv);
+			startUI.position.set(0, 1, 0);
+			scene.add(startUI);
+
+			var start2Div = document.createElement('div');
+			start2Div.className = 'label';
+			start2Div.textContent = 'Rush';
+			start2Div.style.fontFamily = 'Outfit';
+			start2Div.style.color = '#99FF99';
+			start2Div.style.fontSize = '100px';
+			var start2UI = new CSS2DObject(start2Div);
+			start2UI.position.set(0, 1, 0);
+			scene.add(start2UI);
+
+			var start3Div = document.createElement('div');
+			start3Div.className = 'label';
+			start3Div.textContent = 'Press Enter to start!';
+			start3Div.style.fontFamily = 'Outfit';
+			start3Div.style.color = 'white';
+			start3Div.style.fontSize = '30px';
+			var start3UI = new CSS2DObject(start3Div);
+			start3UI.position.set(0, 1, 0);
+			scene.add(start3UI);
+
 			let labelRenderer = new CSS2DRenderer();
 			labelRenderer.setSize(window.innerWidth, window.innerHeight);
 			labelRenderer.domElement.style.top = '0px';
@@ -317,6 +347,9 @@
 					isStart = false;
 					winnerDiv.textContent = ' ';
 					winner2Div.textContent = ' ';
+					startDiv.textContent = ' ';
+					start2Div.textContent = ' ';
+					start3Div.textContent = ' ';
 					scoreDiv.textContent = 'Red: ' + score;
 					score2Div.textContent = 'Green: ' + score;
 					reset();
@@ -397,6 +430,14 @@
 				ui2.position.set(camera.position.x + 0.4, camera.position.y + 0.37, camera.position.z - 1);
 				winnerUI.position.set(camera.position.x, camera.position.y + 0.25, camera.position.z - 1);
 				winnerUI2.position.set(camera.position.x, camera.position.y + 0.2, camera.position.z - 1);
+
+				if (isStart) {
+					startUI.position.set(camera.position.x, camera.position.y + 0.25, camera.position.z - 1);
+					start2UI.position.set(camera.position.x, camera.position.y + 0.21, camera.position.z - 1);
+					start3UI.position.set(camera.position.x, camera.position.y + 0.17, camera.position.z - 1);
+					winnerDiv.textContent = ' ';
+					winner2Div.textContent = ' ';
+				}
 				
 
 				// determines who wins the round
