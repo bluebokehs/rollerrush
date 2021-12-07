@@ -583,13 +583,14 @@
                         object[1].quaternion.z,
                         object[1].quaternion.w
                     );
-                    if (object[1].position.y < -16) {
+                    if (object[1].position.y < -8) {
                         object[0].visible = false;
                         object[1].type = CANNON.Body.STATIC;
                         object[1].velocity.setZero();
                         object[1].angularVelocity.setZero();
                         object[1].mass = 0;
                         object[1].updateMassProperties();
+                        world.removeBody(object[1]);
                     }
                 });
             };
@@ -606,6 +607,7 @@
 
                 gameData.gameObjects.forEach((object) => {
                     object[4].forEach((timeout) => clearTimeout(timeout));
+                    world.addBody(object[1]);
                     object[1].velocity.setZero();
                     object[1].angularVelocity.setZero();
                     object[1].type = CANNON.Body.STATIC;

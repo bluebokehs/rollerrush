@@ -163,7 +163,7 @@ function loadSecondMap(gameData) {
                     levelBody.addEventListener("collide", function (e) {
                         timeouts.push(setTimeout(() => {
                             levelBody.type = CANNON.Body.DYNAMIC;
-                            levelBody.mass = 1;
+                            levelBody.mass = 2;
                             levelBody.updateMassProperties();
                         }, 1000));
                     });
