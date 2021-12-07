@@ -17,7 +17,7 @@ function loadLevel(gameData) {
 function loadFirstMap(gameData) {
     const objLoader = new OBJLoader();
     objLoader.load(
-        "../maps/level6/inner_ring.obj",
+        "../maps/level5.obj",
         (object) => {
             gameData.gameScene.add(object);
 

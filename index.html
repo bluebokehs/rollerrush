@@ -22,8 +22,6 @@
             const scene = new THREE.Scene();
             const winScene = new THREE.Scene();
             var currentScene = null;
-            var removedStageObjects = [];
-            var stageObjects = [];
             let cameraFocus = [0, 0, 0];
             let cameraOffset = [0, 0, 0];
             const camera = new THREE.PerspectiveCamera(
@@ -114,10 +112,12 @@
             // We must add the contact materials to the world
             world.addContactMaterial(slippery_slippery_cm);
 
+            /* LEVEL LOADING */
+
             var gameData = {
                 gameWorld: world,
                 gameScene: scene,
-                gameLevel: 2,
+                gameLevel: 2, // value determines what level is played
                 gameLevelMaterial: new THREE.MeshLambertMaterial({
                     color: 0x77ccff,
                 }),
@@ -125,9 +125,8 @@
                 gameObjects: [],
             };
 
+            // sets the game data according to the level
             gameData = LevelLoader(gameData);
-            stageObjects = gameData.gameObjects;
-
             var levelLoaded = gameData.gameLevelLoaded;
 
             // create player 1
