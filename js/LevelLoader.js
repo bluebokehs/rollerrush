@@ -17,7 +17,7 @@ function loadLevel(gameData) {
     }
 
     objLoader.load(
-        "../maps/level5.obj",
+        gameData.gameLevel,
         (object) => {
             gameData.gameScene.add(object);
 
