@@ -30,7 +30,10 @@ function loadFirstMap(gameData) {
             const indices = Object.keys(vertices).map(Number);
             const levelShape = new CANNON.Trimesh(vertices, indices);
 
-            let levelBody = new CANNON.Body({ mass: 0, material: new CANNON.Material("groundMaterial") });
+            let levelBody = new CANNON.Body({
+                mass: 0,
+                material: new CANNON.Material("groundMaterial"),
+            });
 
             levelBody.addShape(levelShape);
             levelBody.position.x = levelMesh.position.x;
@@ -71,7 +74,10 @@ function loadSecondMap(gameData) {
                 const indices = Object.keys(vertices).map(Number);
                 const levelShape = new CANNON.Trimesh(vertices, indices);
 
-                let levelBody = new CANNON.Body({ mass: 0, material: new CANNON.Material("groundMaterial") });
+                let levelBody = new CANNON.Body({
+                    mass: 0,
+                    material: new CANNON.Material("groundMaterial"),
+                });
 
                 levelBody.addShape(levelShape);
                 levelBody.position.x = levelMesh.position.x;
@@ -89,26 +95,40 @@ function loadSecondMap(gameData) {
         );
     });
 
-    let droppable = ["../maps/level6/box2.obj", "../maps/level6/box3.obj"];
+    let droppable = [
+        "../maps/level6/box2.obj",
+        "../maps/level6/box3.obj",
+        "../maps/level6/box4.obj",
+        "../maps/level6/box5.obj",
+        "../maps/level6/box6.obj",
+        "../maps/level6/box7.obj",
+    ];
     droppable.forEach((model) => {
         for (let i = 0; i < 60; i++) {
             objLoader.load(
                 model,
                 (object) => {
                     gameData.gameScene.add(object);
-    
+
                     let levelMesh = object.children[0];
                     levelMesh.material = gameData.gameLevelMaterial;
                     levelMesh.position.x = 0;
                     levelMesh.position.y = -3;
-                    levelMesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), THREE.Math.degToRad(i * 6));
-    
-                    const vertices = levelMesh.geometry.attributes.position.array;
+                    levelMesh.rotateOnWorldAxis(
+                        new THREE.Vector3(0, 1, 0),
+                        THREE.Math.degToRad(i * 6)
+                    );
+
+                    const vertices =
+                        levelMesh.geometry.attributes.position.array;
                     const indices = Object.keys(vertices).map(Number);
                     const levelShape = new CANNON.Trimesh(vertices, indices);
-    
-                    let levelBody = new CANNON.Body({ mass: 0, material: new CANNON.Material("groundMaterial") });
-    
+
+                    let levelBody = new CANNON.Body({
+                        mass: 0,
+                        material: new CANNON.Material("groundMaterial"),
+                    });
+
                     levelBody.addShape(levelShape);
                     levelBody.position.x = levelMesh.position.x;
                     levelBody.position.y = levelMesh.position.y;
@@ -117,8 +137,35 @@ function loadSecondMap(gameData) {
                     levelBody.quaternion.y = levelMesh.quaternion.y;
                     levelBody.quaternion.z = levelMesh.quaternion.z;
                     levelBody.quaternion.w = levelMesh.quaternion.w;
-    
+
                     gameData.gameWorld.addBody(levelBody);
+                    
+                    let timeouts = [];
+
+                    gameData.gameObjects.push([
+                        levelMesh,
+                        levelBody,
+                        new CANNON.Vec3(
+                            levelBody.position.x,
+                            levelBody.position.y,
+                            levelBody.position.z
+                        ),
+                        new CANNON.Quaternion(
+                            levelBody.quaternion.x,
+                            levelBody.quaternion.y,
+                            levelBody.quaternion.z,
+                            levelBody.quaternion.w
+                        ),
+                        timeouts,
+                    ]);
+
+                    levelBody.addEventListener("collide", function (e) {
+                        timeouts.push(setTimeout(() => {
+                            levelBody.type = CANNON.Body.DYNAMIC;
+                            levelBody.mass = 1;
+                            levelBody.updateMassProperties();
+                        }, 1000));
+                    });
                 },
                 (xhr) => {
                     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
@@ -128,7 +175,6 @@ function loadSecondMap(gameData) {
                 }
             );
         }
-        
     });
     gameData.gameLevelLoaded = true;
 
