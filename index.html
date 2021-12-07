@@ -112,28 +112,21 @@
             world.addContactMaterial(slippery_slippery_cm);
 
             // here
-			
-			var levelMesh;
-            var levelBody = new CANNON.Body({ mass: 0, material: groundMaterial });
 
             var gameData = {
 				gameWorld: world,
 				gameScene: scene,
-                gameLevel: 1,
+                gameLevel: 2,
                 gameLevelMaterial: new THREE.MeshLambertMaterial({
                     color: 0x77ccff,
                 }),
-                gameLevelMesh: levelMesh,
-                gameLevelBody: levelBody,
                 gameLevelLoaded: false,
-                gameGroundMaterial: groundMaterial,
             };
 
             gameData = LevelLoader(gameData);
 
-            levelMesh = gameData.gameLevelMesh;
             var levelLoaded = gameData.gameLevelLoaded;
-			world.addBody(gameData.gameLevelBody);
+			
             /*
 			const objLoader = new OBJLoader();
 			objLoader.load(
@@ -606,20 +599,6 @@
                     body2.quaternion.z,
                     body2.quaternion.w
                 );
-
-                if (levelLoaded) {
-                    levelMesh.position.set(
-                        levelBody.position.x,
-                        levelBody.position.y,
-                        levelBody.position.z
-                    );
-                    levelMesh.quaternion.set(
-                        levelBody.quaternion.x,
-                        levelBody.quaternion.y,
-                        levelBody.quaternion.z,
-                        levelBody.quaternion.w
-                    );
-                }
             };
 
             // draw Scene
