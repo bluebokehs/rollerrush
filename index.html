@@ -1,121 +1,143 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>My first three.js app</title>
-		<style>
-			@import url('https://fonts.googleapis.com/css2?family=Outfit&display=swap');
-			body { margin: 0; }
-		</style>
-	</head>
-	<body scroll="no" style="overflow: hidden">
-		<script src="js/three.js"></script>
-		<script type="module">
-			import * as CANNON from './js/cannon-es.js'
-			//import CannonUtils from './js/cannonUtils.js';
-			import { OBJLoader } from 'https://cdn.skypack.dev/three@0.131.1/examples/jsm/loaders/OBJLoader.js';
+    <head>
+        <meta charset="utf-8" />
+        <title>My first three.js app</title>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Outfit&display=swap");
+            body {
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body scroll="no" style="overflow: hidden">
+        <script src="js/three.js"></script>
+        <script type="module">
+            import * as CANNON from "./js/cannon-es.js";
+            //import CannonUtils from './js/cannonUtils.js';
+            import { OBJLoader } from "https://cdn.skypack.dev/three@0.131.1/examples/jsm/loaders/OBJLoader.js";
+            import { LevelLoader } from "./js/LevelLoader.js";
+            import { CSS2DRenderer, CSS2DObject } from "./js/CSS2DRenderer.js";
 
-			import { CSS2DRenderer, CSS2DObject } from './js/CSS2DRenderer.js';
-				
-			const scene = new THREE.Scene();
-			const winScene = new THREE.Scene();
-			var currentScene = null;
+            const scene = new THREE.Scene();
+            const winScene = new THREE.Scene();
+            var currentScene = null;
 
-			let cameraFocus = [0, 0, 0];
-			let cameraOffset = [0, 0, 0];
-			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			const winCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			var currentCamera = null;
+            let cameraFocus = [0, 0, 0];
+            let cameraOffset = [0, 0, 0];
+            const camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            const winCamera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            var currentCamera = null;
 
-			// orthographic camera
-			//const theHeight = 10 * (window.innerHeight / window.innerWidth);
-			//const camera = new THREE.OrthographicCamera(-5, 5, theHeight/ 2, theHeight / -2, 0.1, 1000);
+            // orthographic camera
+            //const theHeight = 10 * (window.innerHeight / window.innerWidth);
+            //const camera = new THREE.OrthographicCamera(-5, 5, theHeight/ 2, theHeight / -2, 0.1, 1000);
 
-			const renderer = new THREE.WebGLRenderer();
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.shadowMap.enabled = true;
-			document.body.appendChild( renderer.domElement );
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.body.appendChild(renderer.domElement);
 
-			window.addEventListener('resize', function() {
-				var width = window.innerWidth;
-				var height = window.innerHeight;
-				renderer.setSize(width, height);
-				labelRenderer.setSize(width, height);
-				camera.aspect = width / height;
-				camera.updateProjectionMatrix();
-				winCamera.aspect = width / height;
-				winCamera.updateProjectionMatrix();
-			});
+            window.addEventListener("resize", function () {
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+                renderer.setSize(width, height);
+                labelRenderer.setSize(width, height);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                winCamera.aspect = width / height;
+                winCamera.updateProjectionMatrix();
+            });
 
-			// intitialize CannonJS
-			const world = new CANNON.World();
-			world.gravity.set(0, -10, 0); // gravity pulls things down
-			
-			
-			
-			
-			
+            // intitialize CannonJS
+            const world = new CANNON.World();
+            world.gravity.set(0, -10, 0); // gravity pulls things down
 
-			var groundMaterial = new CANNON.Material("groundMaterial");
-			// Adjust constraint equation parameters for ground/ground contact
-			var ground_ground_cm = new CANNON.ContactMaterial(groundMaterial, groundMaterial, {
-				friction: 0.4,
-				restitution: 0.3,
-				contactEquationStiffness: 1e8,
-				contactEquationRelaxation: 3,
-				frictionEquationStiffness: 1e8,
-				frictionEquationRegularizationTime: 3,
-        	});
+            var groundMaterial = new CANNON.Material("groundMaterial");
+            // Adjust constraint equation parameters for ground/ground contact
+            var ground_ground_cm = new CANNON.ContactMaterial(
+                groundMaterial,
+                groundMaterial,
+                {
+                    friction: 0.4,
+                    restitution: 0.3,
+                    contactEquationStiffness: 1e8,
+                    contactEquationRelaxation: 3,
+                    frictionEquationStiffness: 1e8,
+                    frictionEquationRegularizationTime: 3,
+                }
+            );
 
-			// create the cylinder
-			/*
-			const geometry = new THREE.CylinderGeometry(5, 5, 2, 60);
-			const material = new THREE.MeshLambertMaterial( { color: 0x77ccff } );
-			const cylinder = new THREE.Mesh( geometry, material );
-			cylinder.receiveShadow = true;
-			scene.add( cylinder );
-			
-			// create physics for cylinder
-			
-			const cylinderShape = new CANNON.Cylinder(5, 5, 2, 60);
-			const cylinderBody = new CANNON.Body({mass: 0, material: groundMaterial})
-			cylinderBody.addShape(cylinderShape);
-			
-			world.addBody(cylinderBody);
-			*/
+            // Create a slippery material (friction coefficient = 0.0)
+            var slipperyMaterial = new CANNON.Material("slipperyMaterial");
 
+            // The ContactMaterial defines what happens when two materials meet.
+            // In this case we want friction coefficient = 0.0 when the slippery material touches ground.
+            var slippery_ground_cm = new CANNON.ContactMaterial(
+                groundMaterial,
+                slipperyMaterial,
+                {
+                    friction: 0.2,
+                    restitution: 0.15,
+                    contactEquationStiffness: 1e8,
+                    contactEquationRelaxation: 3,
+                }
+            );
 
-			// Create a slippery material (friction coefficient = 0.0)
-			var slipperyMaterial = new CANNON.Material("slipperyMaterial");
+            // We must add the contact materials to the world
+            world.addContactMaterial(slippery_ground_cm);
 
-			// The ContactMaterial defines what happens when two materials meet.
-			// In this case we want friction coefficient = 0.0 when the slippery material touches ground.
-			var slippery_ground_cm = new CANNON.ContactMaterial(groundMaterial, slipperyMaterial, {
-				friction: 0.2,
-				restitution: 0.15,
-				contactEquationStiffness: 1e8,
-				contactEquationRelaxation: 3
-			});
+            // We want to have a heavy impact on player collisions
+            var slippery_slippery_cm = new CANNON.ContactMaterial(
+                slipperyMaterial,
+                slipperyMaterial,
+                {
+                    friction: 0.01,
+                    restitution: 2, // the bounce back of the collision
+                }
+            );
 
-			// We must add the contact materials to the world
-			world.addContactMaterial(slippery_ground_cm);
+            // We must add the contact materials to the world
+            world.addContactMaterial(slippery_slippery_cm);
 
-			// We want to have a heavy impact on player collisions
-			var slippery_slippery_cm = new CANNON.ContactMaterial(slipperyMaterial, slipperyMaterial, {
-				friction: 0.01,
-				restitution: 2 // the bounce back of the collision
-			});
-
-			// We must add the contact materials to the world
-			world.addContactMaterial(slippery_slippery_cm);
+            // here
 			
 			var levelMesh;
-			var levelBody;
-			var levelLoaded = false;
+            var levelBody = new CANNON.Body({ mass: 0, material: groundMaterial });
+
+            var gameData = {
+				gameWorld: world,
+				gameScene: scene,
+                gameLevel: 1,
+                gameLevelMaterial: new THREE.MeshLambertMaterial({
+                    color: 0x77ccff,
+                }),
+                gameLevelMesh: levelMesh,
+                gameLevelBody: levelBody,
+                gameLevelLoaded: false,
+                gameGroundMaterial: groundMaterial,
+            };
+
+            gameData = LevelLoader(gameData);
+
+            levelMesh = gameData.gameLevelMesh;
+            var levelLoaded = gameData.gameLevelLoaded;
+			world.addBody(gameData.gameLevelBody);
+            /*
 			const objLoader = new OBJLoader();
 			objLoader.load(
-                'maps/level5.obj',
+                'maps/level6.obj',
                 (object) => {
                     scene.add(object)
 					
@@ -126,11 +148,7 @@
 
 					const vertices = levelMesh.geometry.attributes.position.array;
         			const indices = Object.keys(vertices).map(Number);			
-					console.log(vertices);
-					console.log(indices);
                     const levelShape = new CANNON.Trimesh(vertices, indices);
-                    
-					console.log(levelShape);
 
 					levelBody = new CANNON.Body({ mass: 0, material: groundMaterial })
                     levelBody.addShape(levelShape)
@@ -149,396 +167,491 @@
                     console.log('An error happened ' + error)
                 }
             )
-
-			/*
-			const planeGeometry = new THREE.PlaneGeometry(25, 25)
-            const planeMesh = new THREE.Mesh(planeGeometry, groundMaterial)
-            planeMesh.position.y = -0.01
-            planeMesh.rotateX(-Math.PI / 2)
-            planeMesh.receiveShadow = true
-            scene.add(planeMesh)
-            const planeShape = new CANNON.Plane()
-            const planeBody = new CANNON.Body({ mass: 0 })
-            planeBody.addShape(planeShape)
-            planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
-            world.addBody(planeBody)
 			*/
 
-			// create player 1
-			const player1Geometry = new THREE.SphereGeometry(0.5, 25, 25);
-			const player1Material = new THREE.MeshLambertMaterial({color:0xff9999});
-			const player1 = new THREE.Mesh(player1Geometry, player1Material);
-			player1.castShadow = true;
-			player1.position.set(-1, 3, 0);
-			scene.add(player1);
+            // to here
 
-			// create physics for player 1
-			const body = new CANNON.Body({mass: 1, material: slipperyMaterial});
-			const spherebody = new CANNON.Sphere(0.5);
-			body.addShape(spherebody);
+            // create player 1
+            const player1Geometry = new THREE.SphereGeometry(0.5, 25, 25);
+            const player1Material = new THREE.MeshLambertMaterial({
+                color: 0xff9999,
+            });
+            const player1 = new THREE.Mesh(player1Geometry, player1Material);
+            player1.castShadow = true;
+            player1.position.set(-1, 3, 0);
+            scene.add(player1);
 
-			const box1 = new CANNON.Box(
-				new CANNON.Vec3(0.25, 0.25, 0.25)
-			);
-			body.addShape(box1);
+            // create physics for player 1
+            const body = new CANNON.Body({
+                mass: 1,
+                material: slipperyMaterial,
+            });
+            const spherebody = new CANNON.Sphere(0.5);
+            body.addShape(spherebody);
 
-			body.position.set(-1, 3, 0);
+            const box1 = new CANNON.Box(new CANNON.Vec3(0.25, 0.25, 0.25));
+            body.addShape(box1);
 
-			// create player 2
-			const player2Geometry = new THREE.SphereGeometry(0.5, 25, 25);
-			const player2Material = new THREE.MeshLambertMaterial({color:0x99ff99});
-			const player2 = new THREE.Mesh(player2Geometry, player2Material);
-			player2.castShadow = true;
-			player2.position.set(1, 3, 0);
-			scene.add(player2);
+            body.position.set(-1, 3, 0);
 
-			// create physics for player 2
-			const body2 = new CANNON.Body({mass: 1, material: slipperyMaterial});
-			const spherebody2 = new CANNON.Sphere(0.5);
-			body2.addShape(spherebody2);
-			
-			body2.position.set(1, 3, 0);
+            // create player 2
+            const player2Geometry = new THREE.SphereGeometry(0.5, 25, 25);
+            const player2Material = new THREE.MeshLambertMaterial({
+                color: 0x99ff99,
+            });
+            const player2 = new THREE.Mesh(player2Geometry, player2Material);
+            player2.castShadow = true;
+            player2.position.set(1, 3, 0);
+            scene.add(player2);
 
-			world.addBody(body);
-			world.addBody(body2);
+            // create physics for player 2
+            const body2 = new CANNON.Body({
+                mass: 1,
+                material: slipperyMaterial,
+            });
+            const spherebody2 = new CANNON.Sphere(0.5);
+            body2.addShape(spherebody2);
 
+            body2.position.set(1, 3, 0);
 
+            world.addBody(body);
+            world.addBody(body2);
 
-			// ui
-			var score = 0;
-			var scoreDiv = document.createElement('div');
-			scoreDiv.className = 'label';
-			scoreDiv.textContent = ' ';
-			scoreDiv.style.fontFamily = 'Outfit';
-			scoreDiv.style.color = 'white';
-			scoreDiv.style.fontSize = '30px';
-			var ui = new CSS2DObject(scoreDiv);
-			ui.position.set(0, 1, 0);
-			scene.add(ui);
+            // ui
+            var score = 0;
+            var scoreDiv = document.createElement("div");
+            scoreDiv.className = "label";
+            scoreDiv.textContent = " ";
+            scoreDiv.style.fontFamily = "Outfit";
+            scoreDiv.style.color = "white";
+            scoreDiv.style.fontSize = "30px";
+            var ui = new CSS2DObject(scoreDiv);
+            ui.position.set(0, 1, 0);
+            scene.add(ui);
 
-			var score2 = 0;
-			var score2Div = document.createElement('div');
-			score2Div.className = 'label';
-			score2Div.textContent = ' ';
-			score2Div.style.fontFamily = 'Outfit';
-			score2Div.style.color = 'white';
-			score2Div.style.fontSize = '30px';
-			var ui2 = new CSS2DObject(score2Div);
-			ui2.position.set(0, 1, 0);
-			scene.add(ui2);
+            var score2 = 0;
+            var score2Div = document.createElement("div");
+            score2Div.className = "label";
+            score2Div.textContent = " ";
+            score2Div.style.fontFamily = "Outfit";
+            score2Div.style.color = "white";
+            score2Div.style.fontSize = "30px";
+            var ui2 = new CSS2DObject(score2Div);
+            ui2.position.set(0, 1, 0);
+            scene.add(ui2);
 
-			// win text
-			var winner = null;
-			var winnerDiv = document.createElement('div');
-			winnerDiv.className = 'label';
-			winnerDiv.textContent = 'Roller Rush';
-			winnerDiv.style.fontFamily = 'Outfit';
-			winnerDiv.style.color = 'white';
-			winnerDiv.style.fontSize = '100px';
-			var winnerUI = new CSS2DObject(winnerDiv);
-			winnerUI.position.set(0, 1, 0);
-			scene.add(winnerUI);
+            // win text
+            var winner = null;
+            var winnerDiv = document.createElement("div");
+            winnerDiv.className = "label";
+            winnerDiv.textContent = "Roller Rush";
+            winnerDiv.style.fontFamily = "Outfit";
+            winnerDiv.style.color = "white";
+            winnerDiv.style.fontSize = "100px";
+            var winnerUI = new CSS2DObject(winnerDiv);
+            winnerUI.position.set(0, 1, 0);
+            scene.add(winnerUI);
 
-			var winner2Div = document.createElement('div');
-			winner2Div.className = 'label';
-			winner2Div.textContent = 'Press Enter to start!';
-			winner2Div.style.fontFamily = 'Outfit';
-			winner2Div.style.color = 'white';
-			winner2Div.style.fontSize = '30px';
-			var winnerUI2 = new CSS2DObject(winner2Div);
-			winnerUI2.position.set(0, 1, 0);
-			scene.add(winnerUI2);
+            var winner2Div = document.createElement("div");
+            winner2Div.className = "label";
+            winner2Div.textContent = "Press Enter to start!";
+            winner2Div.style.fontFamily = "Outfit";
+            winner2Div.style.color = "white";
+            winner2Div.style.fontSize = "30px";
+            var winnerUI2 = new CSS2DObject(winner2Div);
+            winnerUI2.position.set(0, 1, 0);
+            scene.add(winnerUI2);
 
-			var startDiv = document.createElement('div');
-			startDiv.className = 'label';
-			startDiv.textContent = 'Roller';
-			startDiv.style.fontFamily = 'Outfit';
-			startDiv.style.color = '#FF9999';
-			startDiv.style.fontSize = '100px';
-			var startUI = new CSS2DObject(startDiv);
-			startUI.position.set(0, 1, 0);
-			scene.add(startUI);
+            var startDiv = document.createElement("div");
+            startDiv.className = "label";
+            startDiv.textContent = "Roller";
+            startDiv.style.fontFamily = "Outfit";
+            startDiv.style.color = "#FF9999";
+            startDiv.style.fontSize = "100px";
+            var startUI = new CSS2DObject(startDiv);
+            startUI.position.set(0, 1, 0);
+            scene.add(startUI);
 
-			var start2Div = document.createElement('div');
-			start2Div.className = 'label';
-			start2Div.textContent = 'Rush';
-			start2Div.style.fontFamily = 'Outfit';
-			start2Div.style.color = '#99FF99';
-			start2Div.style.fontSize = '100px';
-			var start2UI = new CSS2DObject(start2Div);
-			start2UI.position.set(0, 1, 0);
-			scene.add(start2UI);
+            var start2Div = document.createElement("div");
+            start2Div.className = "label";
+            start2Div.textContent = "Rush";
+            start2Div.style.fontFamily = "Outfit";
+            start2Div.style.color = "#99FF99";
+            start2Div.style.fontSize = "100px";
+            var start2UI = new CSS2DObject(start2Div);
+            start2UI.position.set(0, 1, 0);
+            scene.add(start2UI);
 
-			var start3Div = document.createElement('div');
-			start3Div.className = 'label';
-			start3Div.textContent = 'Press Enter to start!';
-			start3Div.style.fontFamily = 'Outfit';
-			start3Div.style.color = 'white';
-			start3Div.style.fontSize = '30px';
-			var start3UI = new CSS2DObject(start3Div);
-			start3UI.position.set(0, 1, 0);
-			scene.add(start3UI);
+            var start3Div = document.createElement("div");
+            start3Div.className = "label";
+            start3Div.textContent = "Press Enter to start!";
+            start3Div.style.fontFamily = "Outfit";
+            start3Div.style.color = "white";
+            start3Div.style.fontSize = "30px";
+            var start3UI = new CSS2DObject(start3Div);
+            start3UI.position.set(0, 1, 0);
+            scene.add(start3UI);
 
-			let labelRenderer = new CSS2DRenderer();
-			labelRenderer.setSize(window.innerWidth, window.innerHeight);
-			labelRenderer.domElement.style.top = '0px';
-			document.body.appendChild(labelRenderer.domElement);
+            let labelRenderer = new CSS2DRenderer();
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.domElement.style.top = "0px";
+            document.body.appendChild(labelRenderer.domElement);
 
+            // create skybox
+            const cubeGeometry = new THREE.BoxGeometry(1000, 1000, 1000);
+            const cubeMaterials = [
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load("images/skybox_nx.jpg"),
+                    side: THREE.DoubleSide,
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load("images/skybox_px.jpg"),
+                    side: THREE.DoubleSide,
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load("images/skybox_nz.jpg"),
+                    side: THREE.DoubleSide,
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load("images/skybox_ny.jpg"),
+                    side: THREE.DoubleSide,
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load("images/skybox_py.jpg"),
+                    side: THREE.DoubleSide,
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: new THREE.TextureLoader().load("images/skybox_pz.jpg"),
+                    side: THREE.DoubleSide,
+                }),
+            ];
+            const cubeMaterial = new THREE.MeshFaceMaterial(cubeMaterials);
+            const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            scene.add(cube);
 
+            // add fog
+            //const fog = new THREE.Fog(0x666666, 1000, 5000);
+            //scene.add(fog);
 
-			// create skybox
-			const cubeGeometry = new THREE.BoxGeometry(1000, 1000, 1000);
-			const cubeMaterials = [
-				new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox_nx.jpg"), side: THREE.DoubleSide}),
-				new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox_px.jpg"), side: THREE.DoubleSide}),
-				new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox_nz.jpg"), side: THREE.DoubleSide}),
-				new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox_ny.jpg"), side: THREE.DoubleSide}),
-				new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox_py.jpg"), side: THREE.DoubleSide}),
-				new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("images/skybox_pz.jpg"), side: THREE.DoubleSide})
-			];
-			const cubeMaterial = new THREE.MeshFaceMaterial(cubeMaterials);
-			const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-			scene.add(cube);
+            // set up the lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
 
-			// add fog
-			//const fog = new THREE.Fog(0x666666, 1000, 5000);
-			//scene.add(fog);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            directionalLight.position.set(10, 20, 0);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
 
-			// set up the lights
-			const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-			scene.add(ambientLight);
+            // move the camera
+            camera.position.z = 5;
+            camera.position.y = 8;
+            camera.position.x = 0;
+            camera.lookAt(
+                (body2.position.x + body.position.x) / 2,
+                (body2.position.y + body.position.y) / 2,
+                (body2.position.z + body.position.z) / 2
+            );
 
-			const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-			directionalLight.position.set(10, 20, 0);
-			directionalLight.castShadow = true;
-			scene.add(directionalLight);
+            var isDone = false;
+            var isStart = true;
 
-			// move the camera
-			camera.position.z = 5;
-			camera.position.y = 8;
-			camera.position.x = 0;
-			camera.lookAt((body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2);
-			
-			var isDone = false;
-			var isStart = true;
+            // set camera offset
+            cameraOffset[0] =
+                camera.position.x - (body2.position.x + body.position.x) / 2;
+            cameraOffset[1] =
+                camera.position.y - (body2.position.y + body.position.y) / 2;
+            cameraOffset[2] =
+                camera.position.z - (body2.position.z + body.position.z) / 2;
 
-			// set camera offset
-			cameraOffset[0] = camera.position.x - (body2.position.x + body.position.x)/2;
-			cameraOffset[1] = camera.position.y - (body2.position.y + body.position.y)/2;
-			cameraOffset[2] = camera.position.z - (body2.position.z + body.position.z)/2;
+            document.addEventListener("keyup", (event) => {
+                const keyName = event.key;
 
-			document.addEventListener('keyup', (event) => {
-				const keyName = event.key;
+                if (isDone && keyName == "r") {
+                    score = 0;
+                    score2 = 0;
+                    isDone = false;
+                    winnerDiv.textContent = " ";
+                    winner2Div.textContent = " ";
+                    scoreDiv.textContent = "Red: " + score;
+                    score2Div.textContent = "Green: " + score;
+                    reset();
+                }
 
-				if (isDone && keyName == 'r') {
-					score = 0;
-					score2 = 0;
-					isDone = false;
-					winnerDiv.textContent = ' ';
-					winner2Div.textContent = ' ';
-					scoreDiv.textContent = 'Red: ' + score;
-					score2Div.textContent = 'Green: ' + score;
-					reset();
-				}
+                if (isStart && keyName == "Enter") {
+                    score = 0;
+                    score2 = 0;
+                    isStart = false;
+                    winnerDiv.textContent = " ";
+                    winner2Div.textContent = " ";
+                    startDiv.textContent = " ";
+                    start2Div.textContent = " ";
+                    start3Div.textContent = " ";
+                    scoreDiv.textContent = "Red: " + score;
+                    score2Div.textContent = "Green: " + score;
+                    reset();
+                }
 
-				if (isStart && keyName == 'Enter') {
-					score = 0;
-					score2 = 0;
-					isStart = false;
-					winnerDiv.textContent = ' ';
-					winner2Div.textContent = ' ';
-					startDiv.textContent = ' ';
-					start2Div.textContent = ' ';
-					start3Div.textContent = ' ';
-					scoreDiv.textContent = 'Red: ' + score;
-					score2Div.textContent = 'Green: ' + score;
-					reset();
-				}
+                // player 1
+                if (keyName == "w") {
+                    // move player forwards
+                    // body.applyForce(new CANNON.Vec3(0, 0, -180), body.position);
+                    let bonus = Math.max(body.velocity.z * 10, 0);
+                    body.force = new CANNON.Vec3(
+                        body.force.x,
+                        body.force.y,
+                        body.force.z - (bonus + 180)
+                    );
+                }
+                if (keyName == "s") {
+                    // move player backwards
+                    // body.applyForce(new CANNON.Vec3(0, 0, 180), body.position);
+                    let bonus = Math.max(-1 * body.velocity.z * 10, 0);
+                    body.force = new CANNON.Vec3(
+                        body.force.x,
+                        body.force.y,
+                        body.force.z + (bonus + 180)
+                    );
+                }
+                if (keyName == "a") {
+                    // move player left
+                    // body.applyForce(new CANNON.Vec3(-180, 0, 0), body.position);
+                    let bonus = Math.max(body.velocity.x * 10, 0);
+                    body.force = new CANNON.Vec3(
+                        body.force.x - (bonus + 180),
+                        body.force.y,
+                        body.force.z
+                    );
+                }
+                if (keyName == "d") {
+                    // move player right
+                    // body.applyForce(new CANNON.Vec3(180, 0, 0), body.position);
+                    let bonus = Math.max(-1 * body.velocity.x * 10, 0);
+                    body.force = new CANNON.Vec3(
+                        body.force.x + (bonus + 180),
+                        body.force.y,
+                        body.force.z
+                    );
+                }
 
-				// player 1
-				if (keyName == 'w') {
-					// move player forwards
-					// body.applyForce(new CANNON.Vec3(0, 0, -180), body.position);
-					let bonus = Math.max(body.velocity.z * 10, 0)
-					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z - (bonus + 180));
-				}
-				if (keyName == 's') {
-					// move player backwards
-					// body.applyForce(new CANNON.Vec3(0, 0, 180), body.position);
-					let bonus = Math.max(-1 * body.velocity.z * 10, 0)
-					body.force = new CANNON.Vec3(body.force.x, body.force.y, body.force.z + (bonus + 180));
-				}
-				if (keyName == 'a') {
-					// move player left
-					// body.applyForce(new CANNON.Vec3(-180, 0, 0), body.position);
-					let bonus = Math.max(body.velocity.x * 10, 0)
-					body.force = new CANNON.Vec3(body.force.x - (bonus + 180), body.force.y, body.force.z);
-				}
-				if (keyName == 'd') {
-					// move player right
-					// body.applyForce(new CANNON.Vec3(180, 0, 0), body.position);
-					let bonus = Math.max(-1 * body.velocity.x * 10, 0)
-					body.force = new CANNON.Vec3(body.force.x + (bonus + 180), body.force.y, body.force.z);
-				}
+                // player 2
+                if (keyName == "ArrowUp") {
+                    // move player forwards
+                    // body2.applyForce(new CANNON.Vec3(0, 0, -180), body2.position);
+                    let bonus = Math.max(body2.velocity.z * 10, 0);
+                    body2.force = new CANNON.Vec3(
+                        body2.force.x,
+                        body2.force.y,
+                        body2.force.z - (bonus + 180)
+                    );
+                }
+                if (keyName == "ArrowDown") {
+                    // move player backwards
+                    // body2.applyForce(new CANNON.Vec3(0, 0, 180), body2.position);
+                    let bonus = Math.max(-1 * body2.velocity.z * 10, 0);
+                    body2.force = new CANNON.Vec3(
+                        body2.force.x,
+                        body2.force.y,
+                        body2.force.z + (bonus + 180)
+                    );
+                }
+                if (keyName == "ArrowLeft") {
+                    // move player left
+                    // body2.applyForce(new CANNON.Vec3(-180, 0, 0), body2.position);
+                    let bonus = Math.max(body2.velocity.x * 10, 0);
+                    body2.force = new CANNON.Vec3(
+                        body2.force.x - (bonus + 180),
+                        body2.force.y,
+                        body2.force.z
+                    );
+                }
+                if (keyName == "ArrowRight") {
+                    // move player right
+                    // body2.applyForce(new CANNON.Vec3(180, 0, 0), body2.position);
+                    let bonus = Math.max(-1 * body2.velocity.x * 10, 0);
+                    body2.force = new CANNON.Vec3(
+                        body2.force.x + (bonus + 180),
+                        body2.force.y,
+                        body2.force.z
+                    );
+                }
+            });
 
-				// player 2
-				if (keyName == 'ArrowUp') {
-					// move player forwards
-					// body2.applyForce(new CANNON.Vec3(0, 0, -180), body2.position);
-					let bonus = Math.max(body2.velocity.z * 10, 0)
-					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z - (bonus + 180));
-				}
-				if (keyName == 'ArrowDown') {
-					// move player backwards
-					// body2.applyForce(new CANNON.Vec3(0, 0, 180), body2.position);
-					let bonus = Math.max(-1 * body2.velocity.z * 10, 0)
-					body2.force = new CANNON.Vec3(body2.force.x, body2.force.y, body2.force.z + (bonus + 180));
-				}
-				if (keyName == 'ArrowLeft') {
-					// move player left
-					// body2.applyForce(new CANNON.Vec3(-180, 0, 0), body2.position);
-					let bonus = Math.max(body2.velocity.x * 10, 0)
-					body2.force = new CANNON.Vec3(body2.force.x - (bonus + 180), body2.force.y, body2.force.z);
-				}
-				if (keyName == 'ArrowRight') {
-					// move player right
-					// body2.applyForce(new CANNON.Vec3(180, 0, 0), body2.position);
-					let bonus = Math.max(-1 * body2.velocity.x * 10, 0)
-					body2.force = new CANNON.Vec3(body2.force.x + (bonus + 180), body2.force.y, body2.force.z);
-				}
-			})
+            currentScene = scene;
+            currentCamera = camera;
 
-			
+            const clock = new THREE.Clock();
+            let delta;
 
-			currentScene = scene;
-			currentCamera = camera;
+            // game logic
+            const update = function () {
+                if (!isStart && !isDone) {
+                    cameraFocus = [
+                        (body2.position.x + body.position.x) / 2,
+                        (body2.position.y + body.position.y) / 2,
+                        (body2.position.z + body.position.z) / 2,
+                    ];
+                    let cameraZoom =
+                        ((body2.position.x - body.position.x) *
+                            (body2.position.x - body.position.x) +
+                            (body2.position.z - body.position.z) *
+                                (body2.position.z - body.position.z)) /
+                        30;
+                    camera.position.set(
+                        cameraOffset[0] + cameraFocus[0],
+                        cameraOffset[1] + cameraFocus[1] + (cameraZoom * 1) / 4,
+                        cameraOffset[2] + cameraFocus[2] + (cameraZoom * 1) / 2
+                    );
+                    camera.updateProjectionMatrix();
+                }
 
-			const clock = new THREE.Clock();
-			let delta;
+                ui.position.set(
+                    camera.position.x - 0.4,
+                    camera.position.y + 0.37,
+                    camera.position.z - 1
+                );
+                ui2.position.set(
+                    camera.position.x + 0.4,
+                    camera.position.y + 0.37,
+                    camera.position.z - 1
+                );
+                winnerUI.position.set(
+                    camera.position.x,
+                    camera.position.y + 0.25,
+                    camera.position.z - 1
+                );
+                winnerUI2.position.set(
+                    camera.position.x,
+                    camera.position.y + 0.2,
+                    camera.position.z - 1
+                );
 
-			// game logic
-			const update = function () {
-				if (!isStart && !isDone) {
-					cameraFocus = [(body2.position.x + body.position.x)/2, (body2.position.y + body.position.y)/2, (body2.position.z + body.position.z)/2];
-					let cameraZoom = (((body2.position.x - body.position.x) * (body2.position.x - body.position.x)) + ((body2.position.z - body.position.z) * (body2.position.z - body.position.z)))/30;
-					camera.position.set(cameraOffset[0] + cameraFocus[0], (cameraOffset[1] + cameraFocus[1]) + cameraZoom * 1/4, cameraOffset[2] + cameraFocus[2] + cameraZoom * 1/2);
-					camera.updateProjectionMatrix();
-				}
-				
-				
-				ui.position.set(camera.position.x - 0.4, camera.position.y + 0.37, camera.position.z - 1);
-				ui2.position.set(camera.position.x + 0.4, camera.position.y + 0.37, camera.position.z - 1);
-				winnerUI.position.set(camera.position.x, camera.position.y + 0.25, camera.position.z - 1);
-				winnerUI2.position.set(camera.position.x, camera.position.y + 0.2, camera.position.z - 1);
+                if (isStart) {
+                    startUI.position.set(
+                        camera.position.x,
+                        camera.position.y + 0.25,
+                        camera.position.z - 1
+                    );
+                    start2UI.position.set(
+                        camera.position.x,
+                        camera.position.y + 0.21,
+                        camera.position.z - 1
+                    );
+                    start3UI.position.set(
+                        camera.position.x,
+                        camera.position.y + 0.17,
+                        camera.position.z - 1
+                    );
+                    winnerDiv.textContent = " ";
+                    winner2Div.textContent = " ";
+                    scoreDiv.textContent = " ";
+                    score2Div.textContent = " ";
+                }
 
-				if (isStart) {
-					startUI.position.set(camera.position.x, camera.position.y + 0.25, camera.position.z - 1);
-					start2UI.position.set(camera.position.x, camera.position.y + 0.21, camera.position.z - 1);
-					start3UI.position.set(camera.position.x, camera.position.y + 0.17, camera.position.z - 1);
-					winnerDiv.textContent = ' ';
-					winner2Div.textContent = ' ';
-					scoreDiv.textContent = ' ';
-					score2Div.textContent = ' ';
-				}
-				
+                // determines who wins the round
+                if (body.position.y < -8) {
+                    score2++;
+                    score2Div.textContent = "Green: " + score2;
+                    reset();
+                } else if (body2.position.y < -8) {
+                    score++;
+                    scoreDiv.textContent = "Red: " + score;
+                    reset();
+                }
 
-				// determines who wins the round
-				if (body.position.y < -8) {
-					score2++;
-					score2Div.textContent = 'Green: ' + score2;
-					reset();
-				} else if (body2.position.y < -8) {
-					score++;
-					scoreDiv.textContent = 'Red: ' + score;
-					reset();
-				}
+                // determines who wins the match
+                if (score >= 5 && !isStart) {
+                    winner = "Red";
+                    winnerDiv.textContent = winner + " wins!";
+                    winner2Div.textContent = "Press R to restart.";
+                    scoreDiv.textContent = " ";
+                    score2Div.textContent = " ";
+                    camera.position.z = 5;
+                    camera.position.y = 7;
+                    camera.position.x = 0;
+                    isDone = true;
+                } else if (score2 >= 5 && !isStart) {
+                    winner = "Green";
+                    winnerDiv.textContent = winner + " wins!";
+                    winner2Div.textContent = "Press R to restart.";
+                    scoreDiv.textContent = " ";
+                    score2Div.textContent = " ";
+                    camera.position.z = 5;
+                    camera.position.y = 7;
+                    camera.position.x = 0;
+                    isDone = true;
+                }
 
-				// determines who wins the match
-				if (score >= 5 && !isStart) {
-					winner = "Red";
-					winnerDiv.textContent = winner + ' wins!';
-					winner2Div.textContent = 'Press R to restart.';
-					scoreDiv.textContent = ' ';
-					score2Div.textContent = ' ';
-					camera.position.z = 5;
-					camera.position.y = 7;
-					camera.position.x = 0;
-					isDone = true;
-				} else if (score2 >= 5 && !isStart) {
-					winner = "Green";
-					winnerDiv.textContent = winner + ' wins!';
-					winner2Div.textContent = 'Press R to restart.';
-					scoreDiv.textContent = ' ';
-					score2Div.textContent = ' ';
-					camera.position.z = 5;
-					camera.position.y = 7;
-					camera.position.x = 0;
-					isDone = true;
-				}
+                // update three.js player 1
+                player1.position.set(
+                    body.position.x,
+                    body.position.y,
+                    body.position.z
+                );
+                player1.quaternion.set(
+                    body.quaternion.x,
+                    body.quaternion.y,
+                    body.quaternion.z,
+                    body.quaternion.w
+                );
 
-				// update three.js player 1
-				player1.position.set(body.position.x, body.position.y, body.position.z);
-				player1.quaternion.set(
-					body.quaternion.x,
-					body.quaternion.y,
-					body.quaternion.z,
-					body.quaternion.w
-				);
+                // update three.js player 2
+                player2.position.set(
+                    body2.position.x,
+                    body2.position.y,
+                    body2.position.z
+                );
+                player2.quaternion.set(
+                    body2.quaternion.x,
+                    body2.quaternion.y,
+                    body2.quaternion.z,
+                    body2.quaternion.w
+                );
 
-				// update three.js player 2
-				player2.position.set(body2.position.x, body2.position.y, body2.position.z);
-				player2.quaternion.set(
-					body2.quaternion.x,
-					body2.quaternion.y,
-					body2.quaternion.z,
-					body2.quaternion.w
-				);
-
-				if (levelLoaded) {
+                if (levelLoaded) {
                     levelMesh.position.set(
                         levelBody.position.x,
                         levelBody.position.y,
                         levelBody.position.z
-                    )
+                    );
                     levelMesh.quaternion.set(
                         levelBody.quaternion.x,
                         levelBody.quaternion.y,
                         levelBody.quaternion.z,
                         levelBody.quaternion.w
-                    )
+                    );
                 }
-			};
+            };
 
-			// draw Scene
-			const render = function () {
-				renderer.render(scene, camera);
-				labelRenderer.render(scene, camera);
-			};
+            // draw Scene
+            const render = function () {
+                renderer.render(scene, camera);
+                labelRenderer.render(scene, camera);
+            };
 
-			//resets players to original positions
-			const reset = function () {
-				body.position.x = -1;
-				body.position.y = 3;
-				body.position.z = 0;
-				body2.position.x = 1;
-				body2.position.y = 3;
-				body2.position.z = 0;
-				body.velocity = new CANNON.Vec3(0, 0, 0);
-				body2.velocity = new CANNON.Vec3(0, 0, 0);
-				body.angularVelocity = new CANNON.Vec3(0, 0, 0);
-				body2.angularVelocity = new CANNON.Vec3(0, 0, 0);
-			}
+            //resets players to original positions
+            const reset = function () {
+                body.position.x = -1;
+                body.position.y = 3;
+                body.position.z = 0;
+                body2.position.x = 1;
+                body2.position.y = 3;
+                body2.position.z = 0;
+                body.velocity = new CANNON.Vec3(0, 0, 0);
+                body2.velocity = new CANNON.Vec3(0, 0, 0);
+                body.angularVelocity = new CANNON.Vec3(0, 0, 0);
+                body2.angularVelocity = new CANNON.Vec3(0, 0, 0);
+            };
 
-			// run game loop (update, render, repeat)
-			const GameLoop = function () {
-				requestAnimationFrame( GameLoop );
-				delta = Math.min(clock.getDelta(), 0.1);
-				world.step(delta);
-				update();
-				render();
-			};
+            // run game loop (update, render, repeat)
+            const GameLoop = function () {
+                requestAnimationFrame(GameLoop);
+                delta = Math.min(clock.getDelta(), 0.1);
+                world.step(delta);
+                update();
+                render();
+            };
 
-			GameLoop();
-		</script>
-	</body>
+            GameLoop();
+        </script>
+    </body>
 </html>
