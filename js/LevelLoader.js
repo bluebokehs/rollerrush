@@ -96,6 +96,7 @@ function loadSecondMap(gameData) {
     });
 
     let droppable = [
+        "../maps/level6/box1.obj",
         "../maps/level6/box2.obj",
         "../maps/level6/box3.obj",
         "../maps/level6/box4.obj",
