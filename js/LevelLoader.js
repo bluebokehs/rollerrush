@@ -21,7 +21,7 @@ function loadFirstMap(gameData) {
         (object) => {
             gameData.gameScene.add(object);
 
-            var levelMesh = object.children[0];
+            let levelMesh = object.children[0];
             levelMesh.material = gameData.gameLevelMaterial;
             levelMesh.position.x = 0;
             levelMesh.position.y = -3;
@@ -41,6 +41,9 @@ function loadFirstMap(gameData) {
             levelBody.position.z = levelMesh.position.z;
 
             gameData.gameWorld.addBody(levelBody);
+
+            gameData.gameObjects.push([levelMesh, levelBody]);
+
             gameData.gameLevelLoaded = true;
         },
         (xhr) => {
@@ -55,10 +58,7 @@ function loadFirstMap(gameData) {
 
 function loadSecondMap(gameData) {
     const objLoader = new OBJLoader();
-    let objects = [
-        "maps/level6/outer_ring.obj",
-        "maps/level6/inner_ring.obj",
-    ];
+    let objects = ["maps/level6/outer_ring.obj", "maps/level6/inner_ring.obj"];
     objects.forEach((model) => {
         objLoader.load(
             model,
@@ -67,7 +67,7 @@ function loadSecondMap(gameData) {
 
                 let levelMesh = object.children[0];
                 levelMesh.material = new THREE.MeshLambertMaterial({
-                    color: 0x47D9DD,
+                    color: 0x47d9dd,
                 });
                 levelMesh.position.x = 0;
                 levelMesh.position.y = -3;
@@ -87,6 +87,8 @@ function loadSecondMap(gameData) {
                 levelBody.position.z = levelMesh.position.z;
 
                 gameData.gameWorld.addBody(levelBody);
+
+                gameData.gameObjects.push([levelMesh, levelBody]);
             },
             (xhr) => {
                 console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
@@ -144,10 +146,10 @@ function loadSecondMap(gameData) {
                     levelBody.quaternion.w = levelMesh.quaternion.w;
 
                     gameData.gameWorld.addBody(levelBody);
-                    
+
                     let timeouts = [];
 
-                    gameData.gameObjects.push([
+                    gameData.gameDynamics.push([
                         levelMesh,
                         levelBody,
                         new CANNON.Vec3(
@@ -165,11 +167,13 @@ function loadSecondMap(gameData) {
                     ]);
 
                     levelBody.addEventListener("collide", function (e) {
-                        timeouts.push(setTimeout(() => {
-                            levelBody.type = CANNON.Body.DYNAMIC;
-                            levelBody.mass = 2;
-                            levelBody.updateMassProperties();
-                        }, 1000));
+                        timeouts.push(
+                            setTimeout(() => {
+                                levelBody.type = CANNON.Body.DYNAMIC;
+                                levelBody.mass = 2;
+                                levelBody.updateMassProperties();
+                            }, 750)
+                        );
                     });
                 },
                 (xhr) => {

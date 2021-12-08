@@ -128,6 +128,7 @@
                 }),
                 gameLevelLoaded: false,
                 gameObjects: [],
+                gameDynamics: [],
             };
 
             // sets the game data according to the level
@@ -358,14 +359,47 @@
                 }
 
                 if (isStart && keyName == "1") {
-                    scene.remove(gameData.gameObjects);
-                    gameData.gameLevel = 1;
-                    gameData = LevelLoader(gameData);
+                    // removes all the assets for the level
+                    gameData.gameObjects.forEach((object) => {
+                        object[0].geometry.dispose();
+                        object[0].material.dispose();
+                        object[0].parent.remove(object[0]);
+                        world.removeBody(object[1]);
+                    });
+                    gameData.gameDynamics.forEach((object) => {
+                        object[0].geometry.dispose();
+                        object[0].material.dispose();
+                        object[0].parent.remove(object[0]);
+                        world.removeBody(object[1]);
+                    });
+                    gameData.gameDynamics.splice(0, gameData.gameDynamics.length);
+                    gameData.gameObjects.splice(0, gameData.gameObjects.length);
+                    renderer.renderLists.dispose();
+                    gameData.gameLevel = 1; // sets the new level
+                    gameData = LevelLoader(gameData); // loads the level
                     levelLoaded = gameData.gameLevelLoaded;
                 } else if (isStart && keyName == "2") {
-                    gameData.gameLevel = 2;
-                    gameData = LevelLoader(gameData);
+                    // removes all the assets for the level
+                    gameData.gameObjects.forEach((object) => {
+                        object[0].geometry.dispose();
+                        object[0].material.dispose();
+                        object[0].parent.remove(object[0]);
+                        world.removeBody(object[1]);
+                        reset();
+                    });
+                    gameData.gameDynamics.forEach((object) => {
+                        object[0].geometry.dispose();
+                        object[0].material.dispose();
+                        object[0].parent.remove(object[0]);
+                        world.removeBody(object[1]);
+                    });
+                    gameData.gameDynamics.splice(0, gameData.gameDynamics.length);
+                    gameData.gameObjects.splice(0, gameData.gameObjects.length);
+                    renderer.renderLists.dispose();
+                    gameData.gameLevel = 2;  // sets the new level
+                    gameData = LevelLoader(gameData); // loads the level
                     levelLoaded = gameData.gameLevelLoaded;
+                    reset();
                 }
 
                 /* PLAYER MOVEMENT */
@@ -587,7 +621,7 @@
                 );
 
                 // used for dynamic objects in levels
-                gameData.gameObjects.forEach((object) => {
+                gameData.gameDynamics.forEach((object) => {
                     object[0].position.set(
                         object[1].position.x,
                         object[1].position.y,
@@ -621,7 +655,7 @@
             const reset = function () {
                 // re-adds all the removed stage game objects
 
-                gameData.gameObjects.forEach((object) => {
+                gameData.gameDynamics.forEach((object) => {
                     object[4].forEach((timeout) => clearTimeout(timeout));
                     world.addBody(object[1]);
                     object[1].velocity.setZero();
