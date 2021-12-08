@@ -17,7 +17,7 @@ function loadLevel(gameData) {
 function loadFirstMap(gameData) {
     const objLoader = new OBJLoader();
     objLoader.load(
-        "../maps/level5.obj",
+        "maps/level5.obj",
         (object) => {
             gameData.gameScene.add(object);
 
@@ -56,8 +56,8 @@ function loadFirstMap(gameData) {
 function loadSecondMap(gameData) {
     const objLoader = new OBJLoader();
     let objects = [
-        "../maps/level6/outer_ring.obj",
-        "../maps/level6/inner_ring.obj",
+        "maps/level6/outer_ring.obj",
+        "maps/level6/inner_ring.obj",
     ];
     objects.forEach((model) => {
         objLoader.load(
@@ -98,13 +98,13 @@ function loadSecondMap(gameData) {
     });
 
     let droppable = [
-        "../maps/level6/box1.obj",
-        "../maps/level6/box2.obj",
-        "../maps/level6/box3.obj",
-        "../maps/level6/box4.obj",
-        "../maps/level6/box5.obj",
-        "../maps/level6/box6.obj",
-        "../maps/level6/box7.obj",
+        "maps/level6/box1.obj",
+        "maps/level6/box2.obj",
+        "maps/level6/box3.obj",
+        "maps/level6/box4.obj",
+        "maps/level6/box5.obj",
+        "maps/level6/box6.obj",
+        "maps/level6/box7.obj",
     ];
     droppable.forEach((model) => {
         for (let i = 0; i < 60; i++) {
@@ -115,7 +115,7 @@ function loadSecondMap(gameData) {
 
                     let levelMesh = object.children[0];
                     levelMesh.material = new THREE.MeshLambertMaterial({
-                        color: 0xFB8C8A,
+                        color: 0xa1a3b5,
                     });
                     levelMesh.position.x = 0;
                     levelMesh.position.y = -3;
