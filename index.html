@@ -122,7 +122,7 @@
             var gameData = {
                 gameWorld: world,
                 gameScene: scene,
-                gameLevel: 2, // value determines what level is played
+                gameLevel: 1, // value determines what level is played
                 gameLevelMaterial: new THREE.MeshLambertMaterial({
                     color: 0x77ccff,
                 }),
@@ -355,6 +355,17 @@
                     scoreDiv.textContent = "Red: " + score;
                     score2Div.textContent = "Green: " + score;
                     reset();
+                }
+
+                if (isStart && keyName == "1") {
+                    scene.remove(gameData.gameObjects);
+                    gameData.gameLevel = 1;
+                    gameData = LevelLoader(gameData);
+                    levelLoaded = gameData.gameLevelLoaded;
+                } else if (isStart && keyName == "2") {
+                    gameData.gameLevel = 2;
+                    gameData = LevelLoader(gameData);
+                    levelLoaded = gameData.gameLevelLoaded;
                 }
 
                 /* PLAYER MOVEMENT */
