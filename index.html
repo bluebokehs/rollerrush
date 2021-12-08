@@ -448,18 +448,18 @@
             // game logic
             const update = function () {
                 if (!isStart && !isDone) {
-                    cameraFocus = [
+                    cameraFocus = [ // the camera focues on the point between the players
                         (body2.position.x + body.position.x) / 2,
                         (body2.position.y + body.position.y) / 2,
                         (body2.position.z + body.position.z) / 2,
                     ];
-                    let cameraZoom =
+                    let cameraZoom = // this is the rate at which the camera zooms in and out when the player's distance changes
                         ((body2.position.x - body.position.x) *
                             (body2.position.x - body.position.x) +
                             (body2.position.z - body.position.z) *
                                 (body2.position.z - body.position.z)) /
                         30;
-                    camera.position.set(
+                    camera.position.set( // sets the camera to move to follow the players
                         cameraOffset[0] + cameraFocus[0],
                         cameraOffset[1] + cameraFocus[1] + (cameraZoom * 1) / 4,
                         cameraOffset[2] + cameraFocus[2] + (cameraZoom * 1) / 2

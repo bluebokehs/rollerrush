@@ -66,7 +66,9 @@ function loadSecondMap(gameData) {
                 gameData.gameScene.add(object);
 
                 let levelMesh = object.children[0];
-                levelMesh.material = gameData.gameLevelMaterial;
+                levelMesh.material = new THREE.MeshLambertMaterial({
+                    color: 0x47D9DD,
+                });
                 levelMesh.position.x = 0;
                 levelMesh.position.y = -3;
 
@@ -112,7 +114,9 @@ function loadSecondMap(gameData) {
                     gameData.gameScene.add(object);
 
                     let levelMesh = object.children[0];
-                    levelMesh.material = gameData.gameLevelMaterial;
+                    levelMesh.material = new THREE.MeshLambertMaterial({
+                        color: 0xFB8C8A,
+                    });
                     levelMesh.position.x = 0;
                     levelMesh.position.y = -3;
                     levelMesh.rotateOnWorldAxis(
