@@ -257,6 +257,17 @@
             start3UI.position.set(0, 1, 0);
             scene.add(start3UI);
 
+            // map switching descriptor
+            var start4Div = document.createElement("div");
+            start4Div.className = "label";
+            start4Div.textContent = "Change map with (1) or (2)";
+            start4Div.style.fontFamily = "Outfit";
+            start4Div.style.color = "#edfaff";
+            start4Div.style.fontSize = "20px";
+            var start4UI = new CSS2DObject(start4Div);
+            start4UI.position.set(0, 1, 0);
+            scene.add(start4UI);
+
             let labelRenderer = new CSS2DRenderer();
             labelRenderer.setSize(window.innerWidth, window.innerHeight);
             labelRenderer.domElement.style.top = "0px";
@@ -353,6 +364,7 @@
                     startDiv.textContent = " ";
                     start2Div.textContent = " ";
                     start3Div.textContent = " ";
+                    start4Div.textContent = " ";
                     scoreDiv.textContent = "Red: " + score;
                     score2Div.textContent = "Green: " + score;
                     reset();
@@ -527,6 +539,7 @@
                     camera.position.y + 0.37,
                     camera.position.z - 1
                 );
+                
                 winnerUI.position.set(
                     camera.position.x,
                     camera.position.y + 0.25,
@@ -537,6 +550,7 @@
                     camera.position.y + 0.2,
                     camera.position.z - 1
                 );
+                
 
                 if (isStart) {
                     startUI.position.set(
@@ -552,6 +566,11 @@
                     start3UI.position.set(
                         camera.position.x,
                         camera.position.y + 0.17,
+                        camera.position.z - 1
+                    );
+                    start4UI.position.set(
+                        camera.position.x,
+                        camera.position.y + 0.145,
                         camera.position.z - 1
                     );
                     winnerDiv.textContent = " ";
